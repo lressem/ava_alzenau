@@ -71,6 +71,8 @@ body {
   background: var(--bg);
   color: var(--tx);
   font: 400 16px/1.6 var(--body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 a {
   color: inherit;
@@ -244,7 +246,7 @@ nav ul {
   list-style: none;
   margin: 0;
   padding: 0;
-  font: 600 14px var(--head);
+  font: 400 14px var(--head);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }

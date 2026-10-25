@@ -24,8 +24,10 @@ function ava_getWeekDays() {
 }
 
 /**
- * Returns a saved theme setting (from the 'ava_opts' option).
- * Falls back to the default defined in ava_getThemeSettingFields().
+ * Returns a theme setting, translated into the current language.
+ * Uses the saved value (from the 'ava_opts' option) or the default from
+ * ava_getThemeSettingFields(). Text settings go through ava_t() so the
+ * English version is shown on the English site.
  * The option is loaded from the database only once per request.
  *
  * @param string $key Setting key, e.g. 'hero_l1'.
@@ -37,9 +39,12 @@ function ava_getOption($key) {
         $savedOptions = get_option('ava_opts', []);
         if (!is_array($savedOptions)) $savedOptions = [];
     }
-    if (isset($savedOptions[$key])) return $savedOptions[$key];
     $fields = ava_getThemeSettingFields();
-    return $fields[$key][2] ?? '';
+    $value = isset($savedOptions[$key]) ? $savedOptions[$key] : ($fields[$key][2] ?? '');
+
+    $type = $fields[$key][1] ?? '';
+    if ($value !== '' && ($type === 'text' || $type === 'textarea')) return ava_t($value);
+    return $value;
 }
 
 /**

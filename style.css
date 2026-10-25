@@ -186,3 +186,9 @@ h1,h2,h3,.hero h1,.stat b,.plans .price,.vs,.last b,.slot b,.coach h3,.logo b{fo
 .entry h1{font-size:48px;margin-bottom:24px}.entry a{color:var(--gold)}.entry p,.entry li{color:#c4cad4}
 .insta-wrap{min-height:200px}
 .screen-reader-text{position:absolute;left:-9999px}
+
+/* Language switcher (Polylang) */
+.lang-switch{display:flex;gap:10px;list-style:none;margin:0 16px 0 auto;padding:0}
+.lang-switch li{display:flex}
+.lang-switch a{display:flex;opacity:.6}
+.lang-switch .current-lang a,.lang-switch a:hover{opacity:1}

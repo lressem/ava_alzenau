@@ -15,10 +15,10 @@ add_action('wp_enqueue_scripts',function(){
 });
 function ava_nav_fallback(){
  $i=['aktuelles'=>'Aktuelles','liga'=>'Liga','training'=>'Training','verein'=>'Verein','mitmachen'=>'Mitmachen','kontakt'=>'Standort & Kontakt','partner'=>'Partner'];
- echo '<ul>';foreach($i as $k=>$l)echo '<li><a href="'.esc_url(home_url('/#'.$k)).'">'.esc_html($l).'</a></li>';echo '</ul>';
+ echo '<ul>';foreach($i as $k=>$l)echo '<li><a href="'.esc_url(home_url('/#'.$k)).'">'.esc_html(ava_t($l)).'</a></li>';echo '</ul>';
 }
 function ava_footer_fallback(){
  echo '<ul>';foreach(['impressum'=>'Impressum','datenschutz'=>'Datenschutz','vereinssatzung'=>'Vereinssatzung'] as $s=>$l){
-  $p=get_page_by_path($s);echo '<li><a href="'.esc_url($p?get_permalink($p):home_url('/'.$s.'/')).'">'.esc_html($l).'</a></li>';}
+  $p=get_page_by_path($s);echo '<li><a href="'.esc_url($p?get_permalink($p):home_url('/'.$s.'/')).'">'.esc_html(ava_t($l)).'</a></li>';}
  echo '</ul>';
 }

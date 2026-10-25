@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Tells Polylang which post types are translatable and how custom fields behave. -->
+<wpml-config>
+    <custom-types>
+        <custom-type translate="1">sponsor</custom-type>
+        <custom-type translate="1">tabelle</custom-type>
+        <custom-type translate="1">kampftag</custom-type>
+        <custom-type translate="1">training</custom-type>
+        <custom-type translate="1">trainer</custom-type>
+        <custom-type translate="1">mitgliedschaft</custom-type>
+    </custom-types>
+    <custom-fields>
+        <!-- Same in every language: copied to the translation -->
+        <custom-field action="copy">link</custom-field>
+        <custom-field action="copy">gruppe</custom-field>
+        <custom-field action="copy">platz</custom-field>
+        <custom-field action="copy">diff</custom-field>
+        <custom-field action="copy">punkte</custom-field>
+        <custom-field action="copy">eigener</custom-field>
+        <custom-field action="copy">datum</custom-field>
+        <custom-field action="copy">heim</custom-field>
+        <custom-field action="copy">gegner</custom-field>
+        <custom-field action="copy">ort</custom-field>
+        <custom-field action="copy">p_heim</custom-field>
+        <custom-field action="copy">p_gast</custom-field>
+        <custom-field action="copy">ticket</custom-field>
+        <custom-field action="copy">tag</custom-field>
+        <custom-field action="copy">von</custom-field>
+        <custom-field action="copy">bis</custom-field>
+        <custom-field action="copy">coach</custom-field>
+        <custom-field action="copy">preis</custom-field>
+        <custom-field action="copy">top</custom-field>
+        <custom-field action="copy">_demo</custom-field>
+        <!-- Texts the editor translates by hand -->
+        <custom-field action="translate">untertitel</custom-field>
+        <custom-field action="translate">rolle</custom-field>
+        <custom-field action="translate">zitat</custom-field>
+        <custom-field action="translate">intervall</custom-field>
+        <custom-field action="translate">badge</custom-field>
+        <custom-field action="translate">vorteile</custom-field>
+        <custom-field action="translate">button</custom-field>
+    </custom-fields>
+</wpml-config>

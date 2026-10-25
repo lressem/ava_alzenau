@@ -153,7 +153,11 @@ $logo=function($p,$cls='lg'){$u=ava_getPostImageUrl($p->ID,'medium');$l=ava_getM
     </dd></div><?php endif;?>
    </dl>
   </div>
-  <a class="map" href="<?php echo esc_url(ava_getOption('map_link'));?>" target="_blank" rel="noopener" aria-label="<?php echo esc_attr(ava_t('Karte öffnen'));?>" style="background:url(<?php echo esc_url(ava_getOption('map_img')?:ava_getAssetUrl('img/map.webp'));?>) center/cover"></a>
+  <?php if(ava_getOption('map_img')):?>
+  <a class="map" href="<?php echo esc_url(ava_getOption('map_link'));?>" target="_blank" rel="noopener" aria-label="<?php echo esc_attr(ava_t('Karte öffnen'));?>" style="background:url(<?php echo esc_url(ava_getOption('map_img'));?>) center/cover"></a>
+  <?php else:$lat=50.0828453;$lon=9.0613336;?>
+  <div class="map"><iframe title="<?php echo esc_attr(ava_t('Karte öffnen'));?>" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="<?php echo esc_url('https://www.openstreetmap.org/export/embed.html?bbox='.($lon-0.006).'%2C'.($lat-0.0035).'%2C'.($lon+0.006).'%2C'.($lat+0.0035).'&layer=mapnik&marker='.$lat.'%2C'.$lon);?>"></iframe><a class="map-open" href="<?php echo esc_url(ava_getOption('map_link'));?>" target="_blank" rel="noopener"><?php ava_e('Karte öffnen');?></a></div>
+  <?php endif;?>
  </div>
 </div></section>
 

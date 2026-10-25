@@ -115,15 +115,22 @@ $logo=function($p,$cls='lg'){$u=ava_getPostImageUrl($p->ID,'medium');$l=ava_getM
  <p class="eyebrow"><?php ava_e('Deine Ringer-Karriere startet hier');?></p>
   <h2><?php ava_e('Werde Teil des Teams');?></h2>
  <div class="grid g3 plans">
-  <?php foreach(ava_getPosts('mitgliedschaft') as $p):$top=ava_getMeta($p->ID,'top');?>
-  <div class="card<?php echo $top?' top':'';?>"><?php if(ava_getMeta($p->ID,'badge')):?><span class="badge"><?php echo esc_html(ava_getMeta($p->ID,'badge'));?></span><?php endif;?>
+  <?php   foreach(ava_getPosts('mitgliedschaft') as $p):?>
+  <div class="card" tabindex="0" aria-pressed="false"><?php if(ava_getMeta($p->ID,'badge')):?><span class="badge"><?php echo esc_html(ava_getMeta($p->ID,'badge'));?></span><?php endif;?>
    <h3><?php echo esc_html($p->post_title);?></h3>
    <div class="price"><?php echo esc_html(ava_getMeta($p->ID,'preis'));?> <small>/ <?php echo esc_html(ava_getMeta($p->ID,'intervall'));?></small></div>
    <ul><?php foreach(array_filter(array_map('trim',explode("\n",ava_getMeta($p->ID,'vorteile')))) as $li)echo '<li>'.esc_html($li).'</li>';?></ul>
-   <a class="btn <?php echo $top?'gold':'ghost';?>" href="#kontakt"><?php echo esc_html(ava_getMeta($p->ID,'button')?:ava_t('Anmelden'));?></a>
+   <a class="btn ghost" href="#kontakt"><?php echo esc_html(ava_getMeta($p->ID,'button')?:ava_t('Anmelden'));?></a>
   </div>
   <?php endforeach;?>
  </div>
+ <script>
+ document.querySelectorAll('.plans .card').forEach(function(c,_,all){
+  function pick(){all.forEach(function(o){o.classList.toggle('sel',o===c);o.setAttribute('aria-pressed',o===c);});}
+  c.addEventListener('click',pick);
+  c.addEventListener('keydown',function(e){if(e.target===c&&(e.key==='Enter'||e.key===' ')){e.preventDefault();pick();}});
+ });
+ </script>
  <p style="font-size:12px;color:var(--mute)"><?php echo esc_html(ava_getOption('plans_note'));?></p>
  <div class="card probe"><div><h3><?php echo esc_html(ava_getOption('probe_titel'));?></h3><p><?php echo esc_html(ava_getOption('probe_text'));?></p></div><a class="btn" href="#kontakt"><?php ava_e('Probetraining vereinbaren');?></a></div>
 </div></section>

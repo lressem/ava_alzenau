@@ -177,6 +177,8 @@ h1,h2,h3,.hero h1,.stat b,.plans .price,.vs,.last b,.slot b,.coach h3,.logo b{fo
 .lg{width:120px;height:40px;opacity:.6;border-radius:2px;background-color:transparent}
 .news .img{aspect-ratio:432/220;margin:-24px -24px 18px;border-radius:6px 6px 0 0;border:0}
 .coach .ph{aspect-ratio:1}
+.coach{transition:transform .25s ease,box-shadow .25s ease}
+.coach:hover{transform:scale(1.06);box-shadow:0 10px 28px rgba(0,0,0,.35);position:relative;z-index:1}
 .crest{width:44px;height:44px;border:0;box-shadow:none;background-color:#fff}
 .team{aspect-ratio:649/440;border:1px solid var(--line);border-radius:7.5px}
 .contact .map{aspect-ratio:648/405;min-height:0;border:1px solid var(--line);border-radius:7.5px;padding:0}

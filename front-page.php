@@ -92,7 +92,7 @@ $logo=function($p,$cls='lg'){$u=ava_getPostImageUrl($p->ID,'medium');$l=ava_getM
  <div class="card place" style="margin-top:20px"><p><b style="color:var(--tx)"><?php echo esc_html(ava_getOption('trainingsort'));?></b><br><?php echo esc_html(ava_getOption('trainingshinweis'));?></p></div>
  <div class="grid g6" style="margin-top:36px">
   <?php foreach(ava_getPosts('trainer') as $p):?>
-  <div class="card coach"><div class="ph" role="img" aria-label="<?php echo esc_attr($p->post_title);?>" style="background:url(<?php echo esc_url(ava_getPostImageUrl($p->ID));?>) center/cover no-repeat"></div><div class="t"><small><?php echo esc_html(ava_getMeta($p->ID,'rolle'));?></small><h3><?php echo esc_html($p->post_title);?></h3><?php if(ava_getMeta($p->ID,'zitat')):?><p><?php echo esc_html(ava_getMeta($p->ID,'zitat'));?></p><?php endif;?></div></div>
+  <div class="card coach"><div class="ph" role="img" aria-label="<?php echo esc_attr($p->post_title);?>" style="background:url(<?php echo esc_url(ava_getPostImageUrl($p->ID,'large'));?>) center/contain no-repeat"></div><div class="t"><small><?php echo esc_html(ava_getMeta($p->ID,'rolle'));?></small><h3><?php echo esc_html($p->post_title);?></h3><?php if(ava_getMeta($p->ID,'zitat')):?><p><?php echo esc_html(ava_getMeta($p->ID,'zitat'));?></p><?php endif;?></div></div>
   <?php endforeach;?>
  </div>
 </div></section>

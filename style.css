@@ -1160,6 +1160,24 @@ h3,
 .carousel.has-overflow .car-btn {
   display: block;
 }
+.strip .carousel {
+  width: 100%;
+}
+.strip .car-track {
+  justify-content: space-between;
+  gap: 14px;
+  padding: 10px 8px;
+}
+.strip .car-track > * {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+}
+.strip .car-btn.prev {
+  left: -14px;
+}
+.strip .car-btn.next {
+  right: -14px;
+}
 @media (max-width: 1100px) {
   .car-btn.prev {
     left: 4px;

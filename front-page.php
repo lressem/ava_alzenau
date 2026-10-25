@@ -103,9 +103,15 @@ $renderSponsorLogo = function ($sponsor, $class = 'lg') use ($backgroundStyle) {
 <?php if ($stripSponsors): ?>
 <div class="strip"><div class="wrap">
   <span class="t"><?php ava_e('Unsere Sponsoren & Partner'); ?></span>
-  <?php foreach ($stripSponsors as $sponsor): ?>
-  <?php echo $renderSponsorLogo($sponsor); ?>
-  <?php endforeach; ?>
+  <div class="carousel">
+    <button type="button" class="car-btn prev" aria-label="<?php echo esc_attr(ava_t('Zurück')); ?>">&#8249;</button>
+    <div class="car-track">
+      <?php foreach ($stripSponsors as $sponsor): ?>
+      <?php echo $renderSponsorLogo($sponsor); ?>
+      <?php endforeach; ?>
+    </div>
+    <button type="button" class="car-btn next" aria-label="<?php echo esc_attr(ava_t('Weiter')); ?>">&#8250;</button>
+  </div>
 </div></div>
 <?php endif; ?>
 
@@ -444,8 +450,8 @@ $renderSponsorLogo = function ($sponsor, $class = 'lg') use ($backgroundStyle) {
     var next = carousel.querySelector('.next');
 
     function step() {
-      var card = track.querySelector('.card');
-      return card ? card.offsetWidth + parseFloat(getComputedStyle(track).columnGap || 0) : track.clientWidth;
+      var item = track.firstElementChild;
+      return item ? item.offsetWidth + parseFloat(getComputedStyle(track).columnGap || 0) : track.clientWidth;
     }
     function update() {
       var overflow = track.scrollWidth > track.clientWidth + 1;

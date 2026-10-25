@@ -76,17 +76,38 @@ function ava_getPostImageUrl($postId, $size = 'ava-card') {
 /**
  * Fetches all posts of a custom post type, sorted by menu order, then title.
  *
+ * With Polylang the German (default language) posts are the base: in another
+ * language each post is replaced by its translation when one exists, otherwise
+ * the German post is shown. So untranslated lists never come up empty.
+ *
  * @param string $postType
  * @param array  $overrides get_posts() arguments overriding the defaults.
  * @return WP_Post[]
  */
 function ava_getPosts($postType, $overrides = []) {
-    return get_posts(array_merge([
+    $args = array_merge([
         'post_type'        => $postType,
         'numberposts'      => -1,
         'orderby'          => ['menu_order' => 'ASC', 'title' => 'ASC'],
         'suppress_filters' => false,
-    ], $overrides));
+    ], $overrides);
+
+    $canFallBack = function_exists('pll_default_language') && function_exists('pll_current_language')
+        && function_exists('pll_get_post');
+    if (!$canFallBack) return get_posts($args);
+
+    $current = pll_current_language();
+    $default = pll_default_language();
+    if (!$current || !$default || $current === $default) return get_posts($args);
+
+    $args['lang'] = $default;
+    $posts = [];
+    foreach (get_posts($args) as $post) {
+        $translatedId = pll_get_post($post->ID, $current);
+        $translated   = $translatedId ? get_post($translatedId) : null;
+        $posts[]      = $translated ?: $post;
+    }
+    return $posts;
 }
 
 /**

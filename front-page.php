@@ -423,15 +423,43 @@ $renderSponsorLogo = function ($sponsor, $class = 'lg') use ($backgroundStyle) {
   <p class="eyebrow"><?php ava_e('Unterstütze uns und werde Teil des Teams'); ?></p>
   <h2><?php ava_e('Unsere Sponsoren & Partner'); ?></h2>
 
-  <div class="grid g3">
-    <?php foreach (ava_getPosts('sponsor', ['meta_key' => 'gruppe', 'meta_value' => 'partner']) as $sponsor): ?>
-    <div class="card">
-      <div class="partner-logo"><?php echo $renderSponsorLogo($sponsor); ?></div>
-      <h3><?php echo esc_html($sponsor->post_title); ?></h3>
-      <small><?php echo esc_html(ava_getMeta($sponsor->ID, 'untertitel')); ?></small>
+  <div class="carousel">
+    <button type="button" class="car-btn prev" aria-label="<?php echo esc_attr(ava_t('Zurück')); ?>">&#8249;</button>
+    <div class="car-track">
+      <?php foreach (ava_getPosts('sponsor', ['meta_key' => 'gruppe', 'meta_value' => 'partner']) as $sponsor): ?>
+      <div class="card">
+        <div class="partner-logo"><?php echo $renderSponsorLogo($sponsor); ?></div>
+        <h3><?php echo esc_html($sponsor->post_title); ?></h3>
+        <small><?php echo esc_html(ava_getMeta($sponsor->ID, 'untertitel')); ?></small>
+      </div>
+      <?php endforeach; ?>
     </div>
-    <?php endforeach; ?>
+    <button type="button" class="car-btn next" aria-label="<?php echo esc_attr(ava_t('Weiter')); ?>">&#8250;</button>
   </div>
+  <script>
+  // Partner carousel: arrows scroll one card at a time and are hidden when everything fits.
+  document.querySelectorAll('.carousel').forEach(function (carousel) {
+    var track = carousel.querySelector('.car-track');
+    var prev = carousel.querySelector('.prev');
+    var next = carousel.querySelector('.next');
+
+    function step() {
+      var card = track.querySelector('.card');
+      return card ? card.offsetWidth + parseFloat(getComputedStyle(track).columnGap || 0) : track.clientWidth;
+    }
+    function update() {
+      var overflow = track.scrollWidth > track.clientWidth + 1;
+      carousel.classList.toggle('has-overflow', overflow);
+      prev.disabled = track.scrollLeft <= 1;
+      next.disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 1;
+    }
+    prev.addEventListener('click', function () { track.scrollBy({ left: -step(), behavior: 'smooth' }); });
+    next.addEventListener('click', function () { track.scrollBy({ left: step(), behavior: 'smooth' }); });
+    track.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  });
+  </script>
 
   <div class="card sp-cta">
     <div>

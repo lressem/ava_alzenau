@@ -1099,3 +1099,72 @@ h3,
 .spons .sp-cta {
   text-align: left;
 }
+.carousel {
+  position: relative;
+}
+.car-track {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.car-track::-webkit-scrollbar {
+  display: none;
+}
+.car-track .card {
+  flex: 0 0 calc((100% - 40px) / 3);
+  scroll-snap-align: start;
+}
+@media (max-width: 980px) {
+  .car-track .card {
+    flex-basis: calc((100% - 20px) / 2);
+  }
+}
+@media (max-width: 600px) {
+  .car-track .card {
+    flex-basis: 100%;
+  }
+}
+.car-btn {
+  display: none;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--bg2);
+  color: var(--tx);
+  font: 400 28px/1 var(--body);
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    opacity 0.2s;
+}
+.car-btn:hover:not(:disabled) {
+  background: var(--blue);
+}
+.car-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.car-btn.prev {
+  left: -22px;
+}
+.car-btn.next {
+  right: -22px;
+}
+.carousel.has-overflow .car-btn {
+  display: block;
+}
+@media (max-width: 1100px) {
+  .car-btn.prev {
+    left: 4px;
+  }
+  .car-btn.next {
+    right: 4px;
+  }
+}

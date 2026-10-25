@@ -96,6 +96,8 @@ return [
     'Karte öffnen'                    => 'Open map',
     'Unterstütze uns und werde Teil des Teams' => 'Support us and become part of the team',
     'Sponsor werden'                  => 'Become a sponsor',
+    'Zurück'                          => 'Previous',
+    'Weiter'                          => 'Next',
 
     // --- Default values of the theme settings (Vereinsdaten) ---
     'Alzenau - Franken - Bayern'      => 'Alzenau - Franconia - Bavaria',

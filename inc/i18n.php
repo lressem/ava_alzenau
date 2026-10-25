@@ -81,6 +81,6 @@ function ava_renderLanguageSwitcher() {
     if (!function_exists('pll_the_languages')) return;
 
     echo '<ul class="lang-switch">';
-    pll_the_languages(['show_flags' => 1, 'show_names' => 0, 'hide_if_no_translation' => 0]);
+    pll_the_languages(['show_flags' => 1, 'show_names' => 0, 'hide_if_no_translation' => 0, 'hide_if_empty' => 0]);
     echo '</ul>';
 }

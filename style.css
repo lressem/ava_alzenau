@@ -175,8 +175,8 @@ h1,h2,h3,.hero h1,.stat b,.plans .price,.vs,.last b,.slot b,.coach h3,.logo b{fo
 .strip{border:0;padding:56px 0 0}.strip .wrap{justify-content:space-between}
 .strip span.t{color:var(--gold);margin-bottom:8px}
 .strip .wrap{gap:16px 14px}
-.strip .lg{width:170px;height:76px;padding:12px 16px;box-sizing:border-box;background-origin:content-box!important;background-color:var(--card)!important;border-radius:12px;opacity:.6;filter:brightness(.9);transition:transform .25s ease,opacity .25s ease,filter .25s ease}
-.strip a:hover .lg,.strip .lg:hover{transform:scale(1.08);opacity:1;filter:brightness(1.35)}
+.strip .lg{width:170px;height:76px;padding:0;box-sizing:border-box;background-size:cover!important;background-color:var(--card)!important;border-radius:12px;opacity:.7;transition:transform .25s ease,opacity .25s ease,filter .25s ease}
+.strip a:hover .lg,.strip .lg:hover{transform:scale(1.06);opacity:1;filter:brightness(1.12)}
 .lg{width:120px;height:40px;opacity:.6;border-radius:2px;background-color:transparent}
 .news .img{aspect-ratio:432/220;margin:-24px -24px 18px;border-radius:6px 6px 0 0;border:0}
 .coach .ph{aspect-ratio:1}

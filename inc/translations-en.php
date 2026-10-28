@@ -77,6 +77,11 @@ return [
     // --- Front page: training ---
     'Ab auf die Matte'                => 'On the mat',
     'Trainingszeiten & Trainer*innen' => 'Training times & coaches',
+    'Kinder & Jugendtraining'         => 'Children & youth training',
+    'Training 1. Mannschaft RWG'     => 'RWG first-team training',
+    'Jugendintensiv-Training'         => 'Intensive youth training',
+    'Athletik-Training'               => 'Strength and conditioning',
+    'Bambini-Training'                => 'Bambini training',
     'Coach:'                          => 'Coach:',
 
     // --- Front page: club ---
@@ -87,6 +92,23 @@ return [
     // --- Front page: membership ---
     'Deine Ringer-Karriere startet hier' => 'Your wrestling career starts here',
     'Werde Teil des Teams'            => 'Become part of the team',
+    'Jugend / Schüler'                => 'Youth / students',
+    'Aktive Ringer'                   => 'Active wrestlers',
+    'Familienmitgliedschaft'           => 'Family membership',
+    'Wettkämpfer'                     => 'Competitor',
+    'jährlich'                        => 'annually',
+    'monatlich'                       => 'monthly',
+    'Zutritt zum Jugendtraining'      => 'Access to youth training',
+    'Lizenzen für offizielle Wettkämpfe' => 'Licences for official competitions',
+    'Freitickets für Heimkämpfe der 1. Mannschaft' => 'Free tickets to first-team home matches',
+    'Freizeitaktivitäten wie Zeltlager und Wandern' => 'Leisure activities such as camps and hiking',
+    'Voller Zutritt zu allen Trainingseinheiten' => 'Full access to all training sessions',
+    'Professionelle Wettkampfbetreuung' => 'Professional competition support',
+    'Nutzung des Fitness- & Kraftraums*' => 'Use of the fitness and strength room*',
+    'Trainingsanzüge inklusive'       => 'Training kits included',
+    'Unterstützung der Nachwuchsarbeit' => 'Support for youth development',
+    'Einladung zu allen Vereinsevents' => 'Invitations to all club events',
+    'Zugang zum Athletik-Training'    => 'Access to strength and conditioning',
     'Anmelden'                        => 'Sign up',
     'Probetraining vereinbaren'       => 'Book a trial session',
 

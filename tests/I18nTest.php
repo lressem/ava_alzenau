@@ -27,7 +27,22 @@ class I18nTest extends TestCase {
         function pll__($s) { return $s; }
         function pll_current_language() { return 'en'; }
         $this->assertSame('Home', ava_t('Startseite'));
+        $this->assertSame('Children & youth training', ava_t('Kinder & Jugendtraining'));
+        $this->assertSame('Children & youth training', ava_t('Kinder &amp; Jugendtraining'));
+        $this->assertSame('RWG first-team training', ava_t('Training 1. Mannschaft RWG'));
+        $this->assertSame('Intensive youth training', ava_t('Jugendintensiv-Training'));
+        $this->assertSame('Strength and conditioning', ava_t('Athletik-Training'));
+        $this->assertSame('Bambini training', ava_t('Bambini-Training'));
+        $this->assertSame('Family membership', ava_t('Familienmitgliedschaft'));
+        $this->assertSame('Use of the fitness and strength room*', ava_t('Nutzung des Fitness- &amp; Kraftraums*'));
         $this->assertSame('Unknown text', ava_t('Unknown text'));
+    }
+
+    /** @runInSeparateProcess @preserveGlobalState disabled */
+    public function testEnglishDefaultsAreUsedForLocaleStyleLanguageCode() {
+        function pll__($s) { return $s; }
+        function pll_current_language() { return 'en_US'; }
+        $this->assertSame('Children & youth training', ava_t('Kinder & Jugendtraining'));
     }
 
     /** @runInSeparateProcess @preserveGlobalState disabled */

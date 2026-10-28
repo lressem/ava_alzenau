@@ -264,7 +264,7 @@ $renderSponsorLogo = function ($sponsor, $class = 'lg') use ($backgroundStyle) {
       <h3><?php ava_e($day); ?></h3>
       <?php foreach ($slots as $slot): ?>
       <div class="slot">
-        <b><?php echo esc_html($slot->post_title); ?></b>
+        <b><?php ava_e($slot->post_title); ?></b>
         <time><?php echo esc_html(ava_getMeta($slot->ID, 'von') . '–' . ava_getMeta($slot->ID, 'bis')); ?></time>
         <span><?php ava_e('Coach:'); ?> <?php echo esc_html(ava_getMeta($slot->ID, 'coach')); ?></span>
       </div>
@@ -272,7 +272,6 @@ $renderSponsorLogo = function ($sponsor, $class = 'lg') use ($backgroundStyle) {
     </div>
     <?php endforeach; ?>
   </div>
-
   <div class="card place">
     <p>
       <b><?php echo esc_html(ava_getOption('trainingsort')); ?></b><br>
@@ -334,16 +333,16 @@ $renderSponsorLogo = function ($sponsor, $class = 'lg') use ($backgroundStyle) {
     <?php $benefits = array_filter(array_map('trim', explode("\n", ava_getMeta($plan->ID, 'vorteile')))); ?>
     <div class="card" tabindex="0" aria-pressed="false">
       <?php if (ava_getMeta($plan->ID, 'badge')): ?>
-      <span class="badge"><?php echo esc_html(ava_getMeta($plan->ID, 'badge')); ?></span>
+      <span class="badge"><?php ava_e(ava_getMeta($plan->ID, 'badge')); ?></span>
       <?php endif; ?>
-      <h3><?php echo esc_html($plan->post_title); ?></h3>
+      <h3><?php ava_e($plan->post_title); ?></h3>
       <div class="price">
         <?php echo esc_html(ava_getMeta($plan->ID, 'preis')); ?>
-        <small>/ <?php echo esc_html(ava_getMeta($plan->ID, 'intervall')); ?></small>
+        <small>/ <?php ava_e(ava_getMeta($plan->ID, 'intervall')); ?></small>
       </div>
       <ul>
         <?php foreach ($benefits as $benefit): ?>
-        <li><?php echo esc_html($benefit); ?></li>
+        <li><?php ava_e($benefit); ?></li>
         <?php endforeach; ?>
       </ul>
       <a class="btn ghost" href="#kontakt"><?php echo esc_html(ava_t(ava_getMeta($plan->ID, 'button') ?: 'Anmelden')); ?></a>

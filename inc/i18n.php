@@ -33,10 +33,14 @@ function ava_getEnglishStrings() {
 function ava_t($text) {
     if (!function_exists('pll__')) return $text;
 
+    $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
     $translated = pll__($text);
     if ($translated !== $text) return $translated;
 
-    if (function_exists('pll_current_language') && pll_current_language() === 'en') {
+    $language = function_exists('pll_current_language')
+        ? strtolower(str_replace('_', '-', pll_current_language()))
+        : '';
+    if (preg_match('/^en(?:-|$)/', $language)) {
         $english = ava_getEnglishStrings();
         if (isset($english[$text])) return $english[$text];
     }
@@ -70,6 +74,13 @@ function ava_registerTranslatableStrings() {
         if ($field[1] !== 'text' && $field[1] !== 'textarea') continue;
         $value = is_array($saved) && isset($saved[$key]) ? $saved[$key] : $field[2];
         if ($value !== '') pll_register_string($field[0], $value, 'AVA Vereinsdaten', $field[1] === 'textarea');
+    }
+
+    foreach (get_posts(['post_type' => 'training', 'numberposts' => -1, 'suppress_filters' => true]) as $training) {
+        if ($training->post_title !== '') {
+            $title = html_entity_decode($training->post_title, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            pll_register_string(mb_substr($title, 0, 40), $title, 'AVA Training');
+        }
     }
 }
 add_action('init', 'ava_registerTranslatableStrings', 20);

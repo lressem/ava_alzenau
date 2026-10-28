@@ -190,6 +190,17 @@ function ava_getMatchStart($match) {
 }
 
 /**
+ * URL of a club's coat of arms hosted by liga-db.de (file name is the OrgID).
+ *
+ * @param int    $orgId
+ * @param string $size  'klein', 'mittel' or 'gross'.
+ * @return string
+ */
+function ava_getClubLogoUrl($orgId, $size = 'gross') {
+    return 'https://www.liga-db.de/images/vereine/' . $size . '/' . absint($orgId) . '.webp';
+}
+
+/**
  * Fetches all posts of a custom post type, sorted by menu order, then title.
  *
  * With Polylang the German (default language) posts are the base: in another

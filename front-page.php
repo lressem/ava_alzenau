@@ -171,11 +171,19 @@ $renderSponsorLogo = function ($sponsor, $class = 'lg') use ($backgroundStyle) {
                     . trim(wp_date(ava_t('H:i'), $timestamp) . ' ' . ava_t('Uhr'));
       ?>
       <div class="vs">
-        <div class="team"><span class="team-name"><?php echo esc_html($nextMatch['HeimMannschaft']); ?></span><small><?php ava_e('Heim'); ?></small></div>
+        <div class="team">
+          <span class="team-name"><?php echo esc_html($nextMatch['HeimMannschaft']); ?></span>
+          <small><?php ava_e('Heim'); ?></small>
+          <img class="club-logo" src="<?php echo esc_url(ava_getClubLogoUrl($nextMatch['HeimOrganisationsID'])); ?>" alt="" loading="lazy" onerror="this.style.display='none'">
+        </div>
         <i>VS</i>
-        <div class="team"><span class="team-name"><?php echo esc_html($nextMatch['GastMannschaft']); ?></span><small><?php ava_e('Gast'); ?></small></div>
+        <div class="team">
+          <span class="team-name"><?php echo esc_html($nextMatch['GastMannschaft']); ?></span>
+          <small><?php ava_e('Gast'); ?></small>
+          <img class="club-logo" src="<?php echo esc_url(ava_getClubLogoUrl($nextMatch['GastOrganisationsID'])); ?>" alt="" loading="lazy" onerror="this.style.display='none'">
+        </div>
       </div>
-      <div>
+      <div class="when">
         <?php echo esc_html($dateTime); ?>
         <?php if ($isHomeMatch): ?>
         <br><span class="venue"><?php ava_e('Ort:'); ?> <?php echo esc_html(ava_getOption('k_halle')); ?></span>

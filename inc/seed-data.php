@@ -7,7 +7,7 @@ if (!defined('ABSPATH')) exit;
 add_action('after_switch_theme', 'ava_seedDemoData');
 
 /**
- * Creates the demo sponsors, league table, match days, training slots,
+ * Creates the demo sponsors, match days, training slots,
  * trainers, memberships and legal pages. Runs only once ('ava_seeded' flag).
  */
 function ava_seedDemoData() {
@@ -34,19 +34,6 @@ function ava_seedDemoData() {
     $partners = [['Hessischer Ringer-Verband', 'Landesverband'], ['Deutscher Ringer-Bund', 'Bundesverband'], ['Sponsoren', 'Unternehmen']];
     foreach ($partners as $index => $partner) {
         $createPost('sponsor', $partner[0], ['gruppe' => 'partner', 'untertitel' => $partner[1]], 10 + $index);
-    }
-
-    // League table rows: [team, rank, difference, points, highlight (own club)].
-    $leagueTable = [
-        ['RSC Mömbris', 1, '+48', '16:2', ''],
-        ['RV Alzenau', 2, '+32', '14:4', '1'],
-        ['SC Kleinostheim II', 3, '+12', '12:6', ''],
-        ['KSC Goldbach', 4, '+4', '10:8', ''],
-        ['ASV Schaafheim 18', 5, '-6', '6:12', ''],
-        ['SG Arheilgen', 6, '-78', '2:16', ''],
-    ];
-    foreach ($leagueTable as $row) {
-        $createPost('tabelle', $row[0], ['platz' => $row[1], 'diff' => $row[2], 'punkte' => $row[3], 'eigener' => $row[4]]);
     }
 
     // One upcoming and one finished match day.

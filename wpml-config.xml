@@ -3,7 +3,6 @@
 <wpml-config>
     <custom-types>
         <custom-type translate="1">sponsor</custom-type>
-        <custom-type translate="1">tabelle</custom-type>
         <custom-type translate="1">kampftag</custom-type>
         <custom-type translate="1">training</custom-type>
         <custom-type translate="1">trainer</custom-type>
@@ -13,10 +12,6 @@
         <!-- Same in every language: copied to the translation -->
         <custom-field action="copy">link</custom-field>
         <custom-field action="copy">gruppe</custom-field>
-        <custom-field action="copy">platz</custom-field>
-        <custom-field action="copy">diff</custom-field>
-        <custom-field action="copy">punkte</custom-field>
-        <custom-field action="copy">eigener</custom-field>
         <custom-field action="copy">datum</custom-field>
         <custom-field action="copy">heim</custom-field>
         <custom-field action="copy">gegner</custom-field>

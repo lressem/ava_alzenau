@@ -49,6 +49,7 @@ function esc_url_raw($s) { return preg_match('#^https?://#', (string) $s) ? (str
 function sanitize_text_field($s) { return trim(strip_tags((string) $s)); }
 function sanitize_textarea_field($s) { return trim(strip_tags((string) $s)); }
 function sanitize_title($s) { return strtolower(preg_replace('/[^A-Za-z0-9]+/', '-', $s)); }
+function absint($n) { return abs((int) $n); }
 function selected($a, $b, $echo = true) { return (string) $a === (string) $b ? ' selected="selected"' : ''; }
 function checked($a, $b, $echo = true) { return (string) $a === (string) $b ? ' checked="checked"' : ''; }
 

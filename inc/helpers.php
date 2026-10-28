@@ -76,17 +76,25 @@ function ava_getPostImageUrl($postId, $size = 'ava-card') {
 /**
  * Returns the league standings from the liga-db.de API (ErgebnisTabelle),
  * cached for 15 minutes. Returns an empty array when the API is unavailable.
+ * Parameters come from the "Tabelle" admin page (see league-settings.php).
  *
- * @param int $saisonLigaId liga-db.de league ID (the number in /ligen/{id}).
+ * @param int|null $saisonLigaId liga-db.de league ID; default: saved setting.
+ * @param int|null $kampfTagId   Match day ID; default: saved setting (empty = current standings).
  * @return array[] Rows with keys Platzierung, TeamName, Differenz, WertungPlus, WertungMinus, OrgID.
  */
-function ava_getLeagueTable($saisonLigaId = 1257) {
-    $cacheKey = 'ava_liga_table_' . (int) $saisonLigaId;
+function ava_getLeagueTable($saisonLigaId = null, $kampfTagId = null) {
+    $saisonLigaId = (int) ($saisonLigaId ?? ava_getLeagueOption('saison_liga_id'));
+    $kampfTagId   = (int) ($kampfTagId ?? ava_getLeagueOption('kampf_tag_id'));
+
+    $queryArgs = ['saisonLigaId' => $saisonLigaId];
+    if ($kampfTagId > 0) $queryArgs['kampfTagID'] = $kampfTagId;
+
+    $cacheKey = 'ava_liga_table_' . $saisonLigaId . '_' . $kampfTagId;
     $cached = get_transient($cacheKey);
     if (is_array($cached)) return $cached;
 
     $response = wp_remote_get(
-        add_query_arg('saisonLigaId', (int) $saisonLigaId, 'https://ringen.liga-db.de/api/ErgebnisTabelle'),
+        add_query_arg($queryArgs, 'https://ringen.liga-db.de/api/ErgebnisTabelle'),
         ['timeout' => 8, 'headers' => ['Accept' => 'application/json']]
     );
     if (is_wp_error($response) || wp_remote_retrieve_response_code($response) !== 200) return [];

@@ -7,7 +7,7 @@ class ContentTypesTest extends TestCase {
 
     public function testAllExpectedTypesExist() {
         $this->assertSame(
-            ['sponsor', 'tabelle', 'kampftag', 'training', 'trainer', 'mitgliedschaft'],
+            ['sponsor', 'kampftag', 'training', 'trainer', 'mitgliedschaft'],
             array_keys(ava_getContentTypes())
         );
     }

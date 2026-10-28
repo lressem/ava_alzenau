@@ -1,6 +1,6 @@
 <?php
 /**
- * Custom post types (sponsors, league table, matches, training, trainers,
+ * Custom post types (sponsors, matches, training, trainers,
  * memberships), their meta boxes and saving of their custom fields.
  */
 if (!defined('ABSPATH')) exit;
@@ -29,18 +29,6 @@ function ava_getContentTypes() {
                 'link'       => ['Link (URL)', 'url'],
                 'untertitel' => ['Untertitel (nur Bereich Partner)', 'text'],
                 'gruppe'     => ['Anzeige', 'select', ['leiste' => 'Logoleiste oben', 'partner' => 'Bereich Partner']],
-            ],
-        ],
-        // One row of the league table.
-        'tabelle' => [
-            'n' => ['Tabelleneintrag', 'Tabelle (Oberliga)'],
-            'i' => 'dashicons-editor-ol',
-            's' => ['title'],
-            'f' => [
-                'platz'   => ['Platz', 'number'],
-                'diff'    => ['Differenz (z. B. +32)', 'text'],
-                'punkte'  => ['Punkte (z. B. 14:4)', 'text'],
-                'eigener' => ['Eigener Verein hervorheben', 'check'],
             ],
         ],
         // Match day (upcoming or finished).

@@ -170,8 +170,9 @@ $renderSponsorLogo = function ($sponsor, $class = 'lg') use ($backgroundStyle) {
           </tr>
         </thead>
         <tbody>
-          <?php foreach (ava_getLeagueTable(1257) as $row): ?>
-          <tr<?php echo ((int) ($row['OrgID'] ?? 0) === 2221) ? ' class="me"' : ''; ?>>
+          <?php $ownOrgId = (int) ava_getLeagueOption('eigene_org_id'); ?>
+          <?php foreach (ava_getLeagueTable() as $row): ?>
+          <tr<?php echo ($ownOrgId && (int) ($row['OrgID'] ?? 0) === $ownOrgId) ? ' class="me"' : ''; ?>>
             <td><?php echo esc_html($row['Platzierung'] ?? ''); ?></td>
             <td><?php echo esc_html($row['TeamName'] ?? ''); ?></td>
             <td><?php echo esc_html(sprintf('%+d', (int) ($row['Differenz'] ?? 0))); ?></td>

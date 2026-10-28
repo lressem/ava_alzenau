@@ -7,7 +7,7 @@ if (!defined('ABSPATH')) exit;
 add_action('after_switch_theme', 'ava_seedDemoData');
 
 /**
- * Creates the demo sponsors, match days, training slots,
+ * Creates the demo sponsors, training slots,
  * trainers, memberships and legal pages. Runs only once ('ava_seeded' flag).
  */
 function ava_seedDemoData() {
@@ -35,22 +35,6 @@ function ava_seedDemoData() {
     foreach ($partners as $index => $partner) {
         $createPost('sponsor', $partner[0], ['gruppe' => 'partner', 'untertitel' => $partner[1]], 10 + $index);
     }
-
-    // One upcoming and one finished match day.
-    $createPost('kampftag', 'Nächster Kampftag', [
-        'datum'  => date('Y-m-d\T19:30', strtotime('next saturday')),
-        'heim'   => '1',
-        'gegner' => 'KSC Goldbach',
-        'ort'    => 'Prischoßhalle Alzenau',
-    ]);
-    $createPost('kampftag', 'Letzter Kampftag', [
-        'datum'  => date('Y-m-d\T19:30', strtotime('last saturday')),
-        'heim'   => '0',
-        'gegner' => 'SG Arheilgen 06',
-        'ort'    => 'Arheilgen',
-        'p_heim' => '6',
-        'p_gast' => '24',
-    ]);
 
     // Training slots: [title, weekday, from, to, coaches].
     $youthCoaches = 'Heiko, Matze, Sebi & Sebastian';

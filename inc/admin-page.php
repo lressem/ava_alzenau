@@ -25,8 +25,9 @@ function ava_renderSettingsPage() {
     <div class="wrap">
         <h1>Vereinsdaten</h1>
         <p>
-            Texte, Zahlen und Links der Startseite. Listen (Trainer, Training, Tabelle, Kampftage,
-            Mitgliedschaften, Sponsoren) pflegst du in den eigenen Menüpunkten links.
+            Texte, Zahlen und Links der Startseite. Listen (Trainer, Training, Mitgliedschaften, Sponsoren)
+            pflegst du in den eigenen Menüpunkten links. Tabelle und Kampftage kommen von liga-db.de
+            (Menüpunkt „Tabelle“).
         </p>
         <form method="post" action="options.php">
     <?php

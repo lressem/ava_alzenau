@@ -34,8 +34,6 @@ function ava_getThemeSettingFields() {
 
         // --- Liga ---
         'liga_titel' => ['Titel der Tabelle', 'text', 'Tabelle (Oberliga)', 'Liga'],
-        'club_name'  => ['Vereinsname (für Ergebnisse)', 'text', 'Ringer Verein Alzenau', 'Liga'],
-        'club_kurz'  => ['Kurzname (nächster Kampftag)', 'text', 'RVA', 'Liga'],
 
         // --- Training ---
         'trainingsort'     => ['Trainingsort', 'text', 'Trainingsort: Prischoßhalle, Prischoßstraße 42, 63755 Alzenau.', 'Training'],

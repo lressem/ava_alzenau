@@ -17,7 +17,7 @@ class SeedDataTest extends TestCase {
         ava_seedDemoData();
         $this->assertSame(10, $this->countOfType('sponsor'));
         $this->assertSame(0, $this->countOfType('tabelle'));
-        $this->assertSame(2, $this->countOfType('kampftag'));
+        $this->assertSame(0, $this->countOfType('kampftag'));
         $this->assertSame(7, $this->countOfType('training'));
         $this->assertSame(6, $this->countOfType('trainer'));
         $this->assertSame(3, $this->countOfType('mitgliedschaft'));

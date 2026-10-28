@@ -125,6 +125,71 @@ function ava_getLeagueTable($saisonLigaId = null, $kampfTagId = null) {
 }
 
 /**
+ * Returns the team matches from the liga-db.de API (TeamMatches), sorted by
+ * date and start time and cached for 15 minutes. Returns an empty array when
+ * the API is unavailable. Parameters come from the "Tabelle" admin page.
+ *
+ * @return array[] Rows with keys BegegnungsID, KampftagIst, Beginn, HeimMannschaft, GastMannschaft,
+ *                 PunkteHeimWertung, PunkteGastWertung (null until played), HeimOrganisationsID, ...
+ */
+function ava_getLeagueMatches() {
+    $queryArgs = ['saisonLigaID' => (int) ava_getLeagueOption('saison_liga_id')];
+
+    $teamId = (int) ava_getLeagueOption('mannschaften_id');
+    if ($teamId > 0) $queryArgs['mannschaftenID'] = $teamId;
+    $matchDate = ava_getLeagueOption('kampftag');
+    if ($matchDate !== '') $queryArgs['kampftag'] = $matchDate;
+    $logicalMatchDay = (int) ava_getLeagueOption('logischer_kampftag');
+    if ($logicalMatchDay > 0) $queryArgs['logischerKampftag'] = $logicalMatchDay;
+
+    $cacheKey = 'ava_liga_matches_' . md5(http_build_query($queryArgs));
+    $cached = get_transient($cacheKey);
+    if (is_array($cached)) return $cached;
+
+    $matches = ava_fetchLigaDb('TeamMatches', $queryArgs);
+    if (is_wp_error($matches)) return [];
+
+    usort($matches, function ($a, $b) {
+        return [$a['KampftagIst'] ?? '', $a['Beginn'] ?? ''] <=> [$b['KampftagIst'] ?? '', $b['Beginn'] ?? ''];
+    });
+    set_transient($cacheKey, $matches, 15 * MINUTE_IN_SECONDS);
+    return $matches;
+}
+
+/**
+ * Picks the next upcoming match (no result yet, date today or later) and the
+ * last played match (result entered) from a list sorted by date.
+ *
+ * @param array[] $matches Rows from ava_getLeagueMatches().
+ * @param string  $today   Current date, 'Y-m-d'.
+ * @return array ['next' => match|null, 'last' => match|null]
+ */
+function ava_findNextAndLastMatch($matches, $today) {
+    $nextMatch = null;
+    $lastMatch = null;
+    foreach ($matches as $match) {
+        $hasResult = ($match['PunkteHeimWertung'] ?? null) !== null && ($match['PunkteGastWertung'] ?? null) !== null;
+        if ($hasResult) {
+            $lastMatch = $match;
+        } elseif ($nextMatch === null && substr($match['KampftagIst'] ?? '', 0, 10) >= $today) {
+            $nextMatch = $match;
+        }
+    }
+    return ['next' => $nextMatch, 'last' => $lastMatch];
+}
+
+/**
+ * Start of a match as a DateTimeImmutable in the site timezone.
+ *
+ * @param array $match Row from ava_getLeagueMatches().
+ * @return DateTimeImmutable
+ */
+function ava_getMatchStart($match) {
+    $startTime = preg_match('/^\d{1,2}:\d{2}$/', $match['Beginn'] ?? '') ? $match['Beginn'] : '00:00';
+    return new DateTimeImmutable(substr($match['KampftagIst'], 0, 10) . ' ' . $startTime, wp_timezone());
+}
+
+/**
  * Fetches all posts of a custom post type, sorted by menu order, then title.
  *
  * With Polylang the German (default language) posts are the base: in another

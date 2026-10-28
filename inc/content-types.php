@@ -1,6 +1,6 @@
 <?php
 /**
- * Custom post types (sponsors, matches, training, trainers,
+ * Custom post types (sponsors, training, trainers,
  * memberships), their meta boxes and saving of their custom fields.
  */
 if (!defined('ABSPATH')) exit;
@@ -29,21 +29,6 @@ function ava_getContentTypes() {
                 'link'       => ['Link (URL)', 'url'],
                 'untertitel' => ['Untertitel (nur Bereich Partner)', 'text'],
                 'gruppe'     => ['Anzeige', 'select', ['leiste' => 'Logoleiste oben', 'partner' => 'Bereich Partner']],
-            ],
-        ],
-        // Match day (upcoming or finished).
-        'kampftag' => [
-            'n' => ['Kampftag', 'Kampftage'],
-            'i' => 'dashicons-awards',
-            's' => ['title'],
-            'f' => [
-                'datum'  => ['Datum und Uhrzeit', 'datetime-local'],
-                'heim'   => ['Heim oder Auswärts', 'select', ['1' => 'Heimkampf', '0' => 'Auswärtskampf']],
-                'gegner' => ['Gegner', 'text'],
-                'ort'    => ['Ort', 'text'],
-                'p_heim' => ['Punkte Heim-Mannschaft (nach dem Kampf)', 'number'],
-                'p_gast' => ['Punkte Gast-Mannschaft (nach dem Kampf)', 'number'],
-                'ticket' => ['Ticket-Link (optional)', 'url'],
             ],
         ],
         // Weekly training slot.

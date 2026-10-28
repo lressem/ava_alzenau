@@ -7,33 +7,10 @@ get_header();
 // ---------------------------------------------------------------------------
 // Data for the league section
 // ---------------------------------------------------------------------------
-$now = date('Y-m-d\TH:i');
-
-$nextMatchDays = ava_getPosts('kampftag', [
-    'numberposts' => 1,
-    'meta_key'    => 'datum',
-    'orderby'     => 'meta_value',
-    'order'       => 'ASC',
-    'meta_query'  => [['key' => 'datum', 'value' => $now, 'compare' => '>=', 'type' => 'CHAR']],
-]);
-$pastMatchDays = ava_getPosts('kampftag', [
-    'numberposts' => 10,
-    'meta_key'    => 'datum',
-    'orderby'     => 'meta_value',
-    'order'       => 'DESC',
-    'meta_query'  => [['key' => 'datum', 'value' => $now, 'compare' => '<', 'type' => 'CHAR']],
-]);
-
-// Most recent match day that already has a result entered.
-$lastMatchDay = null;
-foreach ($pastMatchDays as $matchDay) {
-    if (ava_getMeta($matchDay->ID, 'p_heim') !== '') {
-        $lastMatchDay = $matchDay;
-        break;
-    }
-}
-
-$clubName = ava_getOption('club_name');
+$matchOverview = ava_findNextAndLastMatch(ava_getLeagueMatches(), wp_date('Y-m-d'));
+$nextMatch     = $matchOverview['next'];
+$lastMatch     = $matchOverview['last'];
+$ownOrgId      = (int) ava_getLeagueOption('eigene_org_id');
 
 // ---------------------------------------------------------------------------
 // Template helpers
@@ -170,7 +147,6 @@ $renderSponsorLogo = function ($sponsor, $class = 'lg') use ($backgroundStyle) {
           </tr>
         </thead>
         <tbody>
-          <?php $ownOrgId = (int) ava_getLeagueOption('eigene_org_id'); ?>
           <?php foreach (ava_getLeagueTable() as $row): ?>
           <tr<?php echo ($ownOrgId && (int) ($row['OrgID'] ?? 0) === $ownOrgId) ? ' class="me"' : ''; ?>>
             <td><?php echo esc_html($row['Platzierung'] ?? ''); ?></td>
@@ -186,46 +162,34 @@ $renderSponsorLogo = function ($sponsor, $class = 'lg') use ($backgroundStyle) {
     <div class="card match">
       <span class="tag"><?php ava_e('Nächster Kampftag'); ?></span>
 
-      <?php if ($nextMatchDays): ?>
+      <?php if ($nextMatch): ?>
       <?php
-      $nextMatchDay = $nextMatchDays[0];
-      $timestamp    = strtotime(ava_getMeta($nextMatchDay->ID, 'datum'));
-      $isHome       = ava_getMeta($nextMatchDay->ID, 'heim') === '1';
-      $opponent     = ava_getMeta($nextMatchDay->ID, 'gegner');
-      $shortName    = ava_getOption('club_kurz');
-      $homeTeam     = $isHome ? $shortName : $opponent;
-      $guestTeam    = $isHome ? $opponent : $shortName;
+      $timestamp    = ava_getMatchStart($nextMatch)->getTimestamp();
+      $isHomeMatch  = $ownOrgId && (int) ($nextMatch['HeimOrganisationsID'] ?? 0) === $ownOrgId;
       $dateTime     = wp_date(ava_t('l, j. F Y'), $timestamp) . ' · '
                     . trim(wp_date(ava_t('H:i'), $timestamp) . ' ' . ava_t('Uhr'));
       ?>
       <div class="vs">
-        <div><?php echo esc_html($homeTeam); ?><small><?php ava_e($isHome ? 'Heim' : 'Gast'); ?></small></div>
+        <div><?php echo esc_html($nextMatch['HeimMannschaft']); ?><small><?php ava_e('Heim'); ?></small></div>
         <i>VS</i>
-        <div><?php echo esc_html($guestTeam); ?><small><?php ava_e($isHome ? 'Gast' : 'Heim'); ?></small></div>
+        <div><?php echo esc_html($nextMatch['GastMannschaft']); ?><small><?php ava_e('Gast'); ?></small></div>
       </div>
       <div>
-        <?php echo esc_html($dateTime); ?><br>
-        <span class="venue"><?php ava_e('Ort:'); ?> <?php echo esc_html(ava_getMeta($nextMatchDay->ID, 'ort')); ?></span>
+        <?php echo esc_html($dateTime); ?>
+        <?php if ($isHomeMatch): ?>
+        <br><span class="venue"><?php ava_e('Ort:'); ?> <?php echo esc_html(ava_getOption('k_halle')); ?></span>
+        <?php endif; ?>
       </div>
-      <?php if (ava_getMeta($nextMatchDay->ID, 'ticket')): ?>
-      <p class="ticket"><a class="btn gold" href="<?php echo esc_url(ava_getMeta($nextMatchDay->ID, 'ticket')); ?>"><?php ava_e('Tickets'); ?></a></p>
-      <?php endif; ?>
 
       <?php else: ?>
       <p class="tbd"><?php ava_e('Der nächste Kampftag wird bald bekanntgegeben.'); ?></p>
       <?php endif; ?>
 
-      <?php if ($lastMatchDay): ?>
-      <?php
-      $wasHome   = ava_getMeta($lastMatchDay->ID, 'heim') === '1';
-      $lastGuest = ava_getMeta($lastMatchDay->ID, 'gegner');
-      $leftTeam  = $wasHome ? $clubName : $lastGuest;
-      $rightTeam = $wasHome ? $lastGuest : $clubName;
-      $score     = ava_getMeta($lastMatchDay->ID, 'p_heim') . ' : ' . ava_getMeta($lastMatchDay->ID, 'p_gast');
-      ?>
+      <?php if ($lastMatch): ?>
+      <?php $score = $lastMatch['PunkteHeimWertung'] . ' : ' . $lastMatch['PunkteGastWertung']; ?>
       <div class="last">
         <?php ava_e('Letztes Ergebnis'); ?><br>
-        <?php echo esc_html($leftTeam); ?> <b><?php echo esc_html($score); ?></b> <?php echo esc_html($rightTeam); ?>
+        <?php echo esc_html($lastMatch['HeimMannschaft']); ?> <b><?php echo esc_html($score); ?></b> <?php echo esc_html($lastMatch['GastMannschaft']); ?>
       </div>
       <?php endif; ?>
     </div>

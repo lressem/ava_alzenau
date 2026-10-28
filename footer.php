@@ -1,6 +1,6 @@
 <footer><div class="wrap">
   <div class="fgrid">
-    <a class="logo" href="<?php echo esc_url(home_url('/')); ?>">
+    <a class="logo" href="<?php echo esc_url(ava_getHomeUrl()); ?>">
       <span class="crest" style="background:url(<?php echo esc_url(ava_getAssetUrl('img/logo.webp')); ?>) center/cover"></span>
       <span><b>AVA</b><small>Athleten-Vereinigung Alzenau 1899 e.V.</small></span>
     </a>

@@ -75,6 +75,17 @@ function ava_registerTranslatableStrings() {
 add_action('init', 'ava_registerTranslatableStrings', 20);
 
 /**
+ * Front page URL in the current language (home_url() always points to the default language).
+ *
+ * @param string $path Appended to the URL, e.g. '#mitmachen'.
+ * @return string
+ */
+function ava_getHomeUrl($path = '') {
+    $homeUrl = function_exists('pll_home_url') ? pll_home_url() : home_url('/');
+    return $homeUrl . $path;
+}
+
+/**
  * Prints the language switcher (flags only). Does nothing without Polylang.
  */
 function ava_renderLanguageSwitcher() {

@@ -1080,23 +1080,40 @@ h3,
   left: -9999px;
 }
 
-/* Language switcher (Polylang) */
+/* Language switcher (Polylang): current flag on top, the others unfold below it on click. */
 .lang-switch {
   display: flex;
-  gap: 10px;
+  flex-direction: column;
+  gap: 6px;
+  height: 24px;
+  position: relative;
+  z-index: 10;
   list-style: none;
   margin: 0 16px 0 auto;
   padding: 0;
 }
 .lang-switch li {
+  display: none;
+  align-items: center;
+  height: 24px;
+}
+.lang-switch .current-lang {
+  display: flex;
+  order: -1;
+}
+.lang-switch.is-open li {
   display: flex;
 }
 .lang-switch a {
   display: flex;
-  opacity: 0.6;
 }
-.lang-switch .current-lang a,
-.lang-switch a:hover {
+.lang-switch .current-lang a {
+  cursor: pointer;
+}
+.lang-switch li:not(.current-lang) a {
+  opacity: 0.8;
+}
+.lang-switch li:not(.current-lang) a:hover {
   opacity: 1;
 }
 /* Small section-specific helpers */

@@ -23,6 +23,7 @@ add_action('after_setup_theme', function () {
 
 add_action('wp_enqueue_scripts', function () {
     wp_enqueue_style('ava', get_stylesheet_uri(), [], AVA_V);
+    wp_enqueue_script('ava-lang-switch', ava_getAssetUrl('js/lang-switch.js'), [], AVA_V, true);
 
     $heroImage = ava_getOption('hero_poster') ?: ava_getAssetUrl('img/hero.webp');
     wp_add_inline_style('ava', ':root{--hero-bg:url("' . esc_url($heroImage) . '")}');
@@ -44,7 +45,7 @@ function ava_nav_fallback() {
 
     echo '<ul>';
     foreach ($items as $anchor => $label) {
-        echo '<li><a href="' . esc_url(home_url('/#' . $anchor)) . '">' . esc_html(ava_t($label)) . '</a></li>';
+        echo '<li><a href="' . esc_url(ava_getHomeUrl('#' . $anchor)) . '">' . esc_html(ava_t($label)) . '</a></li>';
     }
     echo '</ul>';
 }

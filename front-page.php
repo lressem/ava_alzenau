@@ -346,7 +346,7 @@ $renderSponsorLogo = function ($sponsor, $class = 'lg') use ($backgroundStyle) {
         <li><?php echo esc_html($benefit); ?></li>
         <?php endforeach; ?>
       </ul>
-      <a class="btn ghost" href="#kontakt"><?php echo esc_html(ava_getMeta($plan->ID, 'button') ?: ava_t('Anmelden')); ?></a>
+      <a class="btn ghost" href="#kontakt"><?php echo esc_html(ava_t(ava_getMeta($plan->ID, 'button') ?: 'Anmelden')); ?></a>
     </div>
     <?php endforeach; ?>
   </div>

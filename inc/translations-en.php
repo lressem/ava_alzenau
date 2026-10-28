@@ -14,6 +14,8 @@ return [
     'Startseite'                        => 'Home',
     'Hauptnavigation'                   => 'Main navigation',
     'Mitglied werden'                   => 'Become a member',
+    'Nachwuchs anmelden'                => 'Register your child',
+    'Jetzt anmelden'                    => 'Sign up now',
     'Rechtliches'                       => 'Legal',
     'Aktuelles'                         => 'News',
     'Liga'                              => 'League',

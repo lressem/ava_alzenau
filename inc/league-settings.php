@@ -59,6 +59,39 @@ add_action('admin_menu', function () {
     add_menu_page('Tabelle', 'Tabelle', 'manage_options', 'ava_liga', 'ava_renderLeagueSettingsPage', 'dashicons-editor-ol', 4);
 });
 
+// AJAX: finds the leagues of a season (api/Ligen) in which a club (OrgID) has a team (api/Teams).
+add_action('wp_ajax_ava_detectLeague', function () {
+    check_ajax_referer('ava_detectLeague', 'nonce');
+    if (!current_user_can('manage_options')) wp_send_json_error('Keine Berechtigung', 403);
+
+    $orgId = absint($_POST['orgId'] ?? 0);
+    if ($orgId === 0) wp_send_json_error('OrgID ist ein Pflichtfeld');
+
+    $queryArgs = [];
+    $season = absint($_POST['saison'] ?? 0);
+    if ($season > 0) $queryArgs['saison'] = $season;
+    $regionFilter = sanitize_text_field(wp_unslash($_POST['region'] ?? ''));
+
+    $leagues = ava_fetchLigaDb('Ligen', $queryArgs);
+    if (is_wp_error($leagues)) wp_send_json_error($leagues->get_error_message());
+
+    // One Teams call per league, so the region filter keeps the number of calls small.
+    $matches = [];
+    foreach ($leagues as $league) {
+        if ($regionFilter !== '' && stripos($league['VerbandsregionName'] ?? '', $regionFilter) === false) continue;
+
+        $teams = ava_fetchLigaDb('Teams', ['saisonLigaId' => (int) $league['SaisonLigaID']]);
+        if (is_wp_error($teams)) continue;
+        foreach ($teams as $team) {
+            if ((int) ($team['OrgID'] ?? 0) === $orgId) {
+                $matches[] = $league + ['TeamName' => $team['TeamName'] ?? ''];
+                break;
+            }
+        }
+    }
+    wp_send_json_success($matches);
+});
+
 // AJAX: lists the teams of a league (api/Teams) for the team tool on the "Tabelle" page.
 add_action('wp_ajax_ava_searchTeams', function () {
     check_ajax_referer('ava_searchTeams', 'nonce');
@@ -109,6 +142,7 @@ function ava_renderLeagueSettingsPage() {
     submit_button();
     echo '</form>';
 
+    ava_renderLeagueDetectTool();
     ava_renderTeamSearchTool();
     ava_renderRegionSearchTool();
     echo '</div>';
@@ -154,6 +188,72 @@ function ava_renderRegionSearchTool() {
                         .append($("<td>").text(region.RegionName))
                         .append($("<td>").text(region.RegionNameShort))
                         .append($("<td>").text(region.RegionCode))
+                        .appendTo(results.find("tbody"));
+                });
+                results.show();
+            }).fail(function () { status.text("Anfrage fehlgeschlagen."); });
+        });
+    });
+    </script>
+    <?php
+}
+
+/**
+ * Prints the league detection tool: finds the league of the current season in
+ * which the club plays, so the saisonLigaId can be updated every season.
+ * "Übernehmen" only fills the saisonLigaId field above; saving is up to the user.
+ */
+function ava_renderLeagueDetectTool() {
+    ?>
+    <hr>
+    <h2>Liga automatisch ermitteln</h2>
+    <p>
+        Lädt mit <code>GET api/Ligen?saison={saison}</code> die Ligen der Saison und prüft per
+        <code>GET api/Teams?saisonLigaId=…</code>, in welcher davon der Verein (OrgID) spielt.
+        So findest du zu Saisonbeginn die neue saisonLigaId. Der Regionsfilter (Teil von VerbandsregionName)
+        verkürzt die Suche, da pro Liga ein Aufruf nötig ist.
+    </p>
+    <p>
+        <label>OrgID
+            <input type="number" id="ava-detect-org" class="small-text" value="<?php echo esc_attr(ava_getLeagueOption('eigene_org_id')); ?>">
+        </label>
+        <label>saison (leer = aktuelle Saison) <input type="number" id="ava-detect-saison" class="small-text"></label>
+        <label>Region enthält <input type="text" id="ava-detect-region" class="regular-text" value="Hessen"></label>
+        <button type="button" class="button" id="ava-detect-run">Liga ermitteln</button>
+    </p>
+    <p id="ava-detect-status"></p>
+    <table class="widefat striped" id="ava-detect-results" style="display:none;max-width:800px">
+        <thead><tr><th>SaisonLigaID</th><th>Liga</th><th>Region</th><th>Mannschaft</th><th></th></tr></thead>
+        <tbody></tbody>
+    </table>
+    <script>
+    jQuery(function ($) {
+        var nonce = <?php echo wp_json_encode(wp_create_nonce('ava_detectLeague')); ?>;
+        var status = $("#ava-detect-status");
+        var results = $("#ava-detect-results");
+
+        $("#ava-detect-run").on("click", function () {
+            status.text("Suche läuft, das kann einige Sekunden dauern ...");
+            results.hide().find("tbody").empty();
+            $.post(ajaxurl, {
+                action: "ava_detectLeague",
+                nonce: nonce,
+                orgId: $("#ava-detect-org").val(),
+                saison: $("#ava-detect-saison").val(),
+                region: $("#ava-detect-region").val()
+            }).done(function (response) {
+                if (!response.success) { status.text("Fehler: " + response.data); return; }
+                status.text(response.data.length + " Liga(en) gefunden.");
+                $.each(response.data, function (i, league) {
+                    var useButton = $('<button type="button" class="button">Übernehmen</button>').on("click", function () {
+                        $('input[name="ava_liga[saison_liga_id]"]').val(league.SaisonLigaID);
+                    });
+                    $("<tr>")
+                        .append($("<td>").text(league.SaisonLigaID))
+                        .append($("<td>").text(league.LigaName))
+                        .append($("<td>").text(league.VerbandsregionName))
+                        .append($("<td>").text(league.TeamName))
+                        .append($("<td>").append(useButton))
                         .appendTo(results.find("tbody"));
                 });
                 results.show();

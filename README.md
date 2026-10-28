@@ -18,10 +18,16 @@ API-Dokumentation: https://ringen.liga-db.de/Help?cultureName=en
 | `saisonLigaId` | ja | `1257` | ID der Liga; entspricht der Zahl in der URL `https://www.liga-db.de/ligen/1257`. |
 | `kampfTagID` | nein | leer | Tabellenstand zu einem bestimmten Kampftag. Leer = aktueller Stand. Gültige IDs: `GET api/TeamMatchDays?saisonliga={saisonLigaId}`. |
 
-**Liga suchen:** Unter den Einstellungen ruft ein Suchwerkzeug `GET api/Ligen?saison={saison}&regionalKlassenID={regionalKlassenID}`
-auf (beide Parameter optional; leere `saison` = aktuelle Saison, leere `regionalKlassenID` = alle Regionen) und listet
-`SaisonLigaID`, `LigaName` und `VerbandsregionName`. „Übernehmen“ trägt die ID in das Feld `saisonLigaId` ein; danach speichern.
-Die Anfrage läuft serverseitig (AJAX-Aktion `ava_searchLeagues`, nur für Administratoren).
+**Liga automatisch ermitteln:** Das Werkzeug ruft `GET api/Ligen?saison={saison}` (leer = aktuelle Saison) auf und prüft pro Liga
+per `GET api/Teams?saisonLigaId=…`, ob die angegebene OrgID dort eine Mannschaft hat. Treffer (Standard: OrgID `2221`,
+Regionsfilter `Hessen`) werden mit `SaisonLigaID`, Liga und Mannschaft gelistet; „Übernehmen“ trägt die ID in `saisonLigaId` ein.
+Da sich die `saisonLigaId` jede Saison ändert, nutzt man das zu Saisonbeginn (AJAX-Aktion `ava_detectLeague`).
+Der Regionsfilter (Teil von `VerbandsregionName`) begrenzt die Zahl der API-Aufrufe.
+
+**Mannschaften einer Liga:** Unter den Einstellungen ruft ein Werkzeug `GET api/Teams?saisonLigaId={saisonLigaId}` auf
+(`saisonLigaId` Pflicht, vorbelegt mit dem gespeicherten Wert) und listet `TeamID`, `TeamName`, `OrgID` und `TeamIndex`.
+„Übernehmen“ trägt die `OrgID` in das Feld „Eigener Verein“ ein; danach speichern.
+Die Anfrage läuft serverseitig (AJAX-Aktion `ava_searchTeams`, nur für Administratoren).
 
 **Regionen auflisten:** Ein zweites Werkzeug ruft `GET api/Regions?season={season}` auf (`season` optional, leer = alle Regionen)
 und zeigt `RegionID`, `RegionName`, `RegionNameShort` und `RegionCode` (AJAX-Aktion `ava_searchRegions`).

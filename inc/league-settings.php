@@ -59,6 +59,22 @@ add_action('admin_menu', function () {
     add_menu_page('Tabelle', 'Tabelle', 'manage_options', 'ava_liga', 'ava_renderLeagueSettingsPage', 'dashicons-editor-ol', 4);
 });
 
+// AJAX: lists the leagues of a season (api/Ligen) for the search tool on the "Tabelle" page.
+add_action('wp_ajax_ava_searchLeagues', function () {
+    check_ajax_referer('ava_searchLeagues', 'nonce');
+    if (!current_user_can('manage_options')) wp_send_json_error('Keine Berechtigung', 403);
+
+    $queryArgs = [];
+    $season = absint($_POST['saison'] ?? 0);
+    $regionalClassId = absint($_POST['regionalKlassenID'] ?? 0);
+    if ($season > 0) $queryArgs['saison'] = $season;
+    if ($regionalClassId > 0) $queryArgs['regionalKlassenID'] = $regionalClassId;
+
+    $leagues = ava_fetchLigaDb('Ligen', $queryArgs);
+    if (is_wp_error($leagues)) wp_send_json_error($leagues->get_error_message());
+    wp_send_json_success($leagues);
+});
+
 /** Prints the "Tabelle" settings page. */
 function ava_renderLeagueSettingsPage() {
     ?>
@@ -80,5 +96,68 @@ function ava_renderLeagueSettingsPage() {
     }
     echo '</table>';
     submit_button();
-    echo '</form></div>';
+    echo '</form>';
+
+    ava_renderLeagueSearchTool();
+    echo '</div>';
+}
+
+/**
+ * Prints the search tool: queries api/Ligen and lists the leagues, each with a
+ * button that copies its SaisonLigaID into the saisonLigaId field above.
+ * Nothing is saved until the settings form is submitted.
+ */
+function ava_renderLeagueSearchTool() {
+    ?>
+    <hr>
+    <h2>Liga suchen</h2>
+    <p>
+        Ruft <code>GET api/Ligen?saison={saison}&amp;regionalKlassenID={regionalKlassenID}</code> auf und
+        listet die Ligen. Mit „Übernehmen“ wird die ID in das Feld saisonLigaId oben eingetragen
+        (danach noch speichern).
+    </p>
+    <p>
+        <label>saison (leer = aktuelle Saison) <input type="number" id="ava-search-saison" class="small-text"></label>
+        <label>regionalKlassenID (leer = alle) <input type="number" id="ava-search-region" class="small-text"></label>
+        <button type="button" class="button" id="ava-search-run">Ligen laden</button>
+    </p>
+    <p id="ava-search-status"></p>
+    <table class="widefat striped" id="ava-search-results" style="display:none;max-width:800px">
+        <thead><tr><th>SaisonLigaID</th><th>Liga</th><th>Region</th><th></th></tr></thead>
+        <tbody></tbody>
+    </table>
+    <script>
+    jQuery(function ($) {
+        var nonce = <?php echo wp_json_encode(wp_create_nonce('ava_searchLeagues')); ?>;
+        var status = $("#ava-search-status");
+        var results = $("#ava-search-results");
+
+        $("#ava-search-run").on("click", function () {
+            status.text("Lade ...");
+            results.hide().find("tbody").empty();
+            $.post(ajaxurl, {
+                action: "ava_searchLeagues",
+                nonce: nonce,
+                saison: $("#ava-search-saison").val(),
+                regionalKlassenID: $("#ava-search-region").val()
+            }).done(function (response) {
+                if (!response.success) { status.text("Fehler: " + response.data); return; }
+                status.text(response.data.length + " Ligen gefunden.");
+                $.each(response.data, function (i, league) {
+                    var useButton = $('<button type="button" class="button">Übernehmen</button>').on("click", function () {
+                        $('input[name="ava_liga[saison_liga_id]"]').val(league.SaisonLigaID);
+                    });
+                    $("<tr>")
+                        .append($("<td>").text(league.SaisonLigaID))
+                        .append($("<td>").text(league.LigaName))
+                        .append($("<td>").text(league.VerbandsregionName))
+                        .append($("<td>").append(useButton))
+                        .appendTo(results.find("tbody"));
+                });
+                results.show();
+            }).fail(function () { status.text("Anfrage fehlgeschlagen."); });
+        });
+    });
+    </script>
+    <?php
 }

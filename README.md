@@ -18,6 +18,11 @@ API-Dokumentation: https://ringen.liga-db.de/Help?cultureName=en
 | `saisonLigaId` | ja | `1257` | ID der Liga; entspricht der Zahl in der URL `https://www.liga-db.de/ligen/1257`. |
 | `kampfTagID` | nein | leer | Tabellenstand zu einem bestimmten Kampftag. Leer = aktueller Stand. Gültige IDs: `GET api/TeamMatchDays?saisonliga={saisonLigaId}`. |
 
+**Liga suchen:** Unter den Einstellungen ruft ein Suchwerkzeug `GET api/Ligen?saison={saison}&regionalKlassenID={regionalKlassenID}`
+auf (beide Parameter optional; leere `saison` = aktuelle Saison, leere `regionalKlassenID` = alle Regionen) und listet
+`SaisonLigaID`, `LigaName` und `VerbandsregionName`. „Übernehmen“ trägt die ID in das Feld `saisonLigaId` ein; danach speichern.
+Die Anfrage läuft serverseitig (AJAX-Aktion `ava_searchLeagues`, nur für Administratoren).
+
 Zusätzliche Einstellung (kein API-Parameter): **Eigener Verein: OrgID** (Standard `2221` = RWG Alzenau/Kahl)
 hebt die passende Zeile hervor; leer = keine Hervorhebung.
 

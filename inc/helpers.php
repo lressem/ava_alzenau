@@ -74,6 +74,27 @@ function ava_getPostImageUrl($postId, $size = 'ava-card') {
 }
 
 /**
+ * Calls an endpoint of the liga-db.de API and decodes the JSON list.
+ *
+ * @param string $endpoint  Endpoint name, e.g. 'ErgebnisTabelle'.
+ * @param array  $queryArgs Query parameters (name => value).
+ * @return array|WP_Error Decoded response, or an error if the call failed.
+ */
+function ava_fetchLigaDb($endpoint, $queryArgs = []) {
+    $response = wp_remote_get(
+        add_query_arg($queryArgs, 'https://ringen.liga-db.de/api/' . $endpoint),
+        ['timeout' => 8, 'headers' => ['Accept' => 'application/json']]
+    );
+    if (is_wp_error($response)) return $response;
+
+    $statusCode = wp_remote_retrieve_response_code($response);
+    if ($statusCode !== 200) return new WP_Error('ava_liga_db', 'liga-db.de antwortet mit HTTP ' . $statusCode);
+
+    $data = json_decode(wp_remote_retrieve_body($response), true);
+    return is_array($data) ? $data : new WP_Error('ava_liga_db', 'Ungültige Antwort von liga-db.de');
+}
+
+/**
  * Returns the league standings from the liga-db.de API (ErgebnisTabelle),
  * cached for 15 minutes. Returns an empty array when the API is unavailable.
  * Parameters come from the "Tabelle" admin page (see league-settings.php).
@@ -93,14 +114,8 @@ function ava_getLeagueTable($saisonLigaId = null, $kampfTagId = null) {
     $cached = get_transient($cacheKey);
     if (is_array($cached)) return $cached;
 
-    $response = wp_remote_get(
-        add_query_arg($queryArgs, 'https://ringen.liga-db.de/api/ErgebnisTabelle'),
-        ['timeout' => 8, 'headers' => ['Accept' => 'application/json']]
-    );
-    if (is_wp_error($response) || wp_remote_retrieve_response_code($response) !== 200) return [];
-
-    $rows = json_decode(wp_remote_retrieve_body($response), true);
-    if (!is_array($rows)) return [];
+    $rows = ava_fetchLigaDb('ErgebnisTabelle', $queryArgs);
+    if (is_wp_error($rows)) return [];
 
     usort($rows, function ($a, $b) {
         return ($a['Platzierung'] ?? 0) <=> ($b['Platzierung'] ?? 0);

@@ -174,13 +174,13 @@ $renderSponsorLogo = function ($sponsor, $class = 'lg') use ($backgroundStyle) {
         <div class="team">
           <span class="team-name"><?php echo esc_html($nextMatch['HeimMannschaft']); ?></span>
           <small><?php ava_e('Heim'); ?></small>
-          <img class="club-logo" src="<?php echo esc_url(ava_getClubLogoUrl($nextMatch['HeimOrganisationsID'])); ?>" alt="" loading="lazy" onerror="this.style.display='none'">
+          <img class="club-logo" src="<?php echo esc_url(ava_getClubLogoUrl($nextMatch['HeimOrganisationsID'])); ?>" alt="" loading="lazy" onerror="this.onerror=null;this.src='<?php echo esc_url(ava_getFallbackClubLogoUrl()); ?>'">
         </div>
         <i>VS</i>
         <div class="team">
           <span class="team-name"><?php echo esc_html($nextMatch['GastMannschaft']); ?></span>
           <small><?php ava_e('Gast'); ?></small>
-          <img class="club-logo" src="<?php echo esc_url(ava_getClubLogoUrl($nextMatch['GastOrganisationsID'])); ?>" alt="" loading="lazy" onerror="this.style.display='none'">
+          <img class="club-logo" src="<?php echo esc_url(ava_getClubLogoUrl($nextMatch['GastOrganisationsID'])); ?>" alt="" loading="lazy" onerror="this.onerror=null;this.src='<?php echo esc_url(ava_getFallbackClubLogoUrl()); ?>'">
         </div>
       </div>
       <div class="when">
@@ -209,23 +209,26 @@ $renderSponsorLogo = function ($sponsor, $class = 'lg') use ($backgroundStyle) {
   // Next match: both team names get the same font size, small enough that the longer name fits on one line.
   (function () {
     var minFontSize = 12;
+    var maxLines = 2;
+    var lineHeight = 1.05; // keep in sync with .vs .team-name in style.css
 
     function fitTeamNames() {
       document.querySelectorAll('.vs').forEach(function (versus) {
         var names = versus.querySelectorAll('.team-name');
-        names.forEach(function (name) { name.style.fontSize = ''; name.style.whiteSpace = ''; });
+        names.forEach(function (name) { name.style.fontSize = ''; });
 
         var fontSize = parseFloat(getComputedStyle(names[0]).fontSize);
         names.forEach(function (name) {
           var size = fontSize;
-          while (name.scrollWidth > name.parentElement.clientWidth && size > minFontSize) size -= 1;
+          name.style.fontSize = size + 'px';
+          // A name may wrap onto two lines, but no single word may overflow the column.
+          while (size > minFontSize && (name.scrollWidth > name.parentElement.clientWidth || name.offsetHeight > size * maxLines * lineHeight + 1)) {
+            size -= 1;
+            name.style.fontSize = size + 'px';
+          }
           fontSize = Math.min(fontSize, size);
         });
-        names.forEach(function (name) {
-          name.style.fontSize = fontSize + 'px';
-          // Still too wide at the smallest size: let the name wrap instead of overflowing.
-          if (name.scrollWidth > name.parentElement.clientWidth) name.style.whiteSpace = 'normal';
-        });
+        names.forEach(function (name) { name.style.fontSize = fontSize + 'px'; });
       });
     }
 

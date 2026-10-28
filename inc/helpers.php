@@ -201,6 +201,15 @@ function ava_getClubLogoUrl($orgId, $size = 'gross') {
 }
 
 /**
+ * Placeholder image liga-db.de uses for clubs without a coat of arms.
+ *
+ * @return string
+ */
+function ava_getFallbackClubLogoUrl() {
+    return 'https://www.liga-db.de/images/vereine/klein/kein-logo.webp';
+}
+
+/**
  * Fetches all posts of a custom post type, sorted by menu order, then title.
  *
  * With Polylang the German (default language) posts are the base: in another

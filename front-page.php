@@ -163,12 +163,12 @@ $renderSponsorLogo = function ($sponsor, $class = 'lg') use ($backgroundStyle) {
           </tr>
         </thead>
         <tbody>
-          <?php foreach (ava_getPosts('tabelle', ['meta_key' => 'platz', 'orderby' => 'meta_value_num', 'order' => 'ASC']) as $row): ?>
-          <tr<?php echo ava_getMeta($row->ID, 'eigener') ? ' class="me"' : ''; ?>>
-            <td><?php echo esc_html(ava_getMeta($row->ID, 'platz')); ?></td>
-            <td><?php echo esc_html($row->post_title); ?></td>
-            <td><?php echo esc_html(ava_getMeta($row->ID, 'diff')); ?></td>
-            <td><?php echo esc_html(ava_getMeta($row->ID, 'punkte')); ?></td>
+          <?php foreach (ava_getLeagueTable(1257) as $row): ?>
+          <tr<?php echo ((int) ($row['OrgID'] ?? 0) === 2221) ? ' class="me"' : ''; ?>>
+            <td><?php echo esc_html($row['Platzierung'] ?? ''); ?></td>
+            <td><?php echo esc_html($row['TeamName'] ?? ''); ?></td>
+            <td><?php echo esc_html(sprintf('%+d', (int) ($row['Differenz'] ?? 0))); ?></td>
+            <td><?php echo esc_html(($row['WertungPlus'] ?? 0) . ':' . ($row['WertungMinus'] ?? 0)); ?></td>
           </tr>
           <?php endforeach; ?>
         </tbody>

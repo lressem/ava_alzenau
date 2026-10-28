@@ -74,6 +74,34 @@ function ava_getPostImageUrl($postId, $size = 'ava-card') {
 }
 
 /**
+ * Returns the league standings from the liga-db.de API (ErgebnisTabelle),
+ * cached for 15 minutes. Returns an empty array when the API is unavailable.
+ *
+ * @param int $saisonLigaId liga-db.de league ID (the number in /ligen/{id}).
+ * @return array[] Rows with keys Platzierung, TeamName, Differenz, WertungPlus, WertungMinus, OrgID.
+ */
+function ava_getLeagueTable($saisonLigaId = 1257) {
+    $cacheKey = 'ava_liga_table_' . (int) $saisonLigaId;
+    $cached = get_transient($cacheKey);
+    if (is_array($cached)) return $cached;
+
+    $response = wp_remote_get(
+        add_query_arg('saisonLigaId', (int) $saisonLigaId, 'https://ringen.liga-db.de/api/ErgebnisTabelle'),
+        ['timeout' => 8, 'headers' => ['Accept' => 'application/json']]
+    );
+    if (is_wp_error($response) || wp_remote_retrieve_response_code($response) !== 200) return [];
+
+    $rows = json_decode(wp_remote_retrieve_body($response), true);
+    if (!is_array($rows)) return [];
+
+    usort($rows, function ($a, $b) {
+        return ($a['Platzierung'] ?? 0) <=> ($b['Platzierung'] ?? 0);
+    });
+    set_transient($cacheKey, $rows, 15 * MINUTE_IN_SECONDS);
+    return $rows;
+}
+
+/**
  * Fetches all posts of a custom post type, sorted by menu order, then title.
  *
  * With Polylang the German (default language) posts are the base: in another

@@ -160,6 +160,7 @@ $renderSponsorLogo = function ($sponsor, $class = 'lg') use ($backgroundStyle) {
     </div>
 
     <div class="card match">
+      <div class="next">
       <span class="tag"><?php ava_e('Nächster Kampftag'); ?></span>
 
       <?php if ($nextMatch): ?>
@@ -170,9 +171,9 @@ $renderSponsorLogo = function ($sponsor, $class = 'lg') use ($backgroundStyle) {
                     . trim(wp_date(ava_t('H:i'), $timestamp) . ' ' . ava_t('Uhr'));
       ?>
       <div class="vs">
-        <div><?php echo esc_html($nextMatch['HeimMannschaft']); ?><small><?php ava_e('Heim'); ?></small></div>
+        <div class="team"><span class="team-name"><?php echo esc_html($nextMatch['HeimMannschaft']); ?></span><small><?php ava_e('Heim'); ?></small></div>
         <i>VS</i>
-        <div><?php echo esc_html($nextMatch['GastMannschaft']); ?><small><?php ava_e('Gast'); ?></small></div>
+        <div class="team"><span class="team-name"><?php echo esc_html($nextMatch['GastMannschaft']); ?></span><small><?php ava_e('Gast'); ?></small></div>
       </div>
       <div>
         <?php echo esc_html($dateTime); ?>
@@ -184,6 +185,7 @@ $renderSponsorLogo = function ($sponsor, $class = 'lg') use ($backgroundStyle) {
       <?php else: ?>
       <p class="tbd"><?php ava_e('Der nächste Kampftag wird bald bekanntgegeben.'); ?></p>
       <?php endif; ?>
+      </div>
 
       <?php if ($lastMatch): ?>
       <?php $score = $lastMatch['PunkteHeimWertung'] . ' : ' . $lastMatch['PunkteGastWertung']; ?>
@@ -195,6 +197,35 @@ $renderSponsorLogo = function ($sponsor, $class = 'lg') use ($backgroundStyle) {
     </div>
 
   </div>
+  <script>
+  // Next match: both team names get the same font size, small enough that the longer name fits on one line.
+  (function () {
+    var minFontSize = 12;
+
+    function fitTeamNames() {
+      document.querySelectorAll('.vs').forEach(function (versus) {
+        var names = versus.querySelectorAll('.team-name');
+        names.forEach(function (name) { name.style.fontSize = ''; name.style.whiteSpace = ''; });
+
+        var fontSize = parseFloat(getComputedStyle(names[0]).fontSize);
+        names.forEach(function (name) {
+          var size = fontSize;
+          while (name.scrollWidth > name.parentElement.clientWidth && size > minFontSize) size -= 1;
+          fontSize = Math.min(fontSize, size);
+        });
+        names.forEach(function (name) {
+          name.style.fontSize = fontSize + 'px';
+          // Still too wide at the smallest size: let the name wrap instead of overflowing.
+          if (name.scrollWidth > name.parentElement.clientWidth) name.style.whiteSpace = 'normal';
+        });
+      });
+    }
+
+    fitTeamNames();
+    window.addEventListener('resize', fitTeamNames);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitTeamNames);
+  })();
+  </script>
 </div></section>
 
 <section id="training"><div class="wrap">

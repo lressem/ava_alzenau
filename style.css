@@ -454,8 +454,17 @@ tr.me td:first-child {
   box-shadow: inset 3px 0 var(--blue-l);
 }
 .match {
+  display: flex;
+  flex-direction: column;
   text-align: center;
   border-top: 3px solid var(--gold);
+}
+.match .next {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 .match .tag {
   display: inline-block;
@@ -466,12 +475,22 @@ tr.me td:first-child {
   padding: 3px 10px;
   text-transform: uppercase;
 }
+/* VS stays in the middle column; the team names share the remaining width equally. */
 .vs {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  justify-content: space-around;
+  gap: 12px;
+  width: 100%;
   margin: 26px 0;
   font: 800 40px var(--head);
+}
+.vs .team {
+  min-width: 0;
+}
+.vs .team-name {
+  display: block;
+  white-space: nowrap;
 }
 .vs small {
   display: block;
@@ -487,14 +506,15 @@ tr.me td:first-child {
 }
 .last {
   margin-top: 20px;
-  padding-top: 18px;
+  padding-top: 14px;
   border-top: 1px solid var(--line);
-  font-size: 15px;
+  font-size: 13px;
+  color: var(--mute);
 }
 .last b {
-  font: 800 24px var(--head);
+  font: 800 18px var(--head);
   color: var(--gold);
-  margin: 0 8px;
+  margin: 0 6px;
 }
 
 /* Training */

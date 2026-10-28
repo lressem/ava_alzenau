@@ -121,6 +121,12 @@ $renderSponsorLogo = function ($sponsor, $class = 'lg') use ($backgroundStyle) {
 
   <?php if (ava_getOption('news_shortcode')): ?>
   <div class="insta-wrap"><?php echo do_shortcode(wp_kses_post(ava_getOption('news_shortcode'))); ?></div>
+  <a class="btn insta-follow"
+   href="https://www.instagram.com/avalzenau/"
+   target="_blank"
+   rel="noopener noreferrer">
+    <?php ava_e('Weitere Beiträge auf Instagram'); ?>
+</a>
   <?php else: ?>
   <?php
   // Placeholder cards: [date, title, text]. Image: assets/img/news-N.webp
@@ -144,6 +150,7 @@ $renderSponsorLogo = function ($sponsor, $class = 'lg') use ($backgroundStyle) {
   <p class="note"><?php ava_e('Platzhalter. Zum Aktivieren des Instagram-Feeds den Shortcode des Plugins unter „Vereinsdaten“ eintragen.'); ?></p>
   <?php endif; ?>
 </div></section>
+
 
 <section id="liga"><div class="wrap">
   <p class="eyebrow"><?php ava_e('Sei hautnah dabei'); ?></p>

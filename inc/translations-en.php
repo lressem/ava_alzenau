@@ -45,6 +45,7 @@ return [
     'Unsere Sponsoren & Partner'      => 'Our sponsors & partners',
     'News aus dem Verein'             => 'Club news',
     'Aktuelles & Kampftage'           => 'News & match days',
+    'Weitere Beiträge auf Instagram'  => 'Load more posts on Instagram',
     'Beitragsbild'                    => 'Featured image',
     '19. September 2026'              => 'September 19, 2026',
     'Fight Day gegen Großzimmern'     => 'Fight day against Großzimmern',

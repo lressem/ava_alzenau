@@ -23,6 +23,10 @@ auf (beide Parameter optional; leere `saison` = aktuelle Saison, leere `regional
 `SaisonLigaID`, `LigaName` und `VerbandsregionName`. „Übernehmen“ trägt die ID in das Feld `saisonLigaId` ein; danach speichern.
 Die Anfrage läuft serverseitig (AJAX-Aktion `ava_searchLeagues`, nur für Administratoren).
 
+**Regionen auflisten:** Ein zweites Werkzeug ruft `GET api/Regions?season={season}` auf (`season` optional, leer = alle Regionen)
+und zeigt `RegionID`, `RegionName`, `RegionNameShort` und `RegionCode` (AJAX-Aktion `ava_searchRegions`).
+Hinweis: `RegionID` entspricht nicht dem `regionalKlassenID`-Parameter von `api/Ligen` (z. B. Hessen = 5 liefert dort einen Fehler).
+
 Zusätzliche Einstellung (kein API-Parameter): **Eigener Verein: OrgID** (Standard `2221` = RWG Alzenau/Kahl)
 hebt die passende Zeile hervor; leer = keine Hervorhebung.
 

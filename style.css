@@ -479,7 +479,7 @@ tr.me td:first-child {
 .vs {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  align-items: center;
+  align-items: stretch;
   gap: 12px;
   width: 100%;
   margin: 26px 0;
@@ -494,9 +494,17 @@ tr.me td:first-child {
 }
 .vs .team {
   min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
+.vs i {
+  align-self: center;
+}
+/* Reserve two lines so both teams' labels and logos line up whether a name wraps or not. */
 .vs .team-name {
-  display: block;
+  display: grid;
+  align-content: center;
+  min-height: 2.1em;
   line-height: 1.05;
   overflow-wrap: normal;
 }

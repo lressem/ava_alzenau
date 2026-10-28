@@ -27,6 +27,28 @@ function ava_getLeagueSettingFields() {
         'logischer_kampftag' => ['logischerKampftag (optional)', 'number', '', 'Nur Begegnungen dieses logischen Kampftags (Spieltag-Nummer 1, 2, ...). Leer = alle. Gleicher Hinweis wie bei kampftag.', $matchSection],
 
         'eigene_org_id'  => ['Eigener Verein: OrgID (nur Anzeige)', 'number', '2221', 'Die Tabellenzeile mit dieser OrgID wird hervorgehoben; bei Heimkämpfen wird der Ort angezeigt (RWG Alzenau/Kahl = 2221). Leer = keine Hervorhebung.', 'Darstellung auf der Webseite'],
+
+        'manual_table' => [
+            'Manuelle Tabelle',
+            'manual_table',
+            [],
+            'Ersatzdaten, falls liga-db.de nicht erreichbar ist. Trage eine Mannschaft pro Zeile ein.',
+            'Manuelle Ersatzdaten',
+        ],
+        'manual_matches' => [
+            'Manuelle Kampftage',
+            'manual_matches',
+            [],
+            'Ersatzdaten, falls liga-db.de nicht erreichbar ist. Trage eine Begegnung pro Zeile ein; kommende Kämpfe können ohne Ergebnis gespeichert werden.',
+            'Manuelle Ersatzdaten',
+        ],
+        'test_api_unavailable' => [
+            'Liga-DB-Ausfall simulieren',
+            'check',
+            '',
+            'Nur zum Testen: Tabellen- und Kampftag-API-Aufrufe werden als fehlgeschlagen behandelt, damit die manuellen Ersatzdaten angezeigt werden. Danach wieder deaktivieren.',
+            'Testmodus',
+        ],
     ];
 }
 
@@ -34,12 +56,12 @@ function ava_getLeagueSettingFields() {
  * Returns one league setting (saved value, or the default if nothing is saved).
  *
  * @param string $key Key from ava_getLeagueSettingFields().
- * @return string
+ * @return mixed
  */
 function ava_getLeagueOption($key) {
     $fields = ava_getLeagueSettingFields();
     $saved = get_option('ava_liga', []);
-    if (is_array($saved) && isset($saved[$key])) return (string) $saved[$key];
+    if (is_array($saved) && array_key_exists($key, $saved)) return $saved[$key];
     return $fields[$key][2] ?? '';
 }
 
@@ -55,14 +77,245 @@ function ava_sanitizeLeagueSettings($input) {
     $clean = [];
     foreach (ava_getLeagueSettingFields() as $key => $field) {
         $value = isset($input[$key]) ? $input[$key] : '';
-        if ($field[1] === 'date') {
+        if ($field[1] === 'manual_table') {
+            $clean[$key] = ava_parseManualLeagueTable($value);
+            $invalidRows = ava_countInvalidManualLeagueRows($value, $key);
+            if ($invalidRows > 0 && function_exists('add_settings_error')) {
+                add_settings_error('ava_liga', 'ava_invalid_' . $key, sprintf('%s: %d unvollständige oder ungültige Zeile(n) wurden ignoriert.', $field[0], $invalidRows), 'warning');
+            }
+        } elseif ($field[1] === 'manual_matches') {
+            $clean[$key] = ava_parseManualLeagueMatches($value);
+            $invalidRows = ava_countInvalidManualLeagueRows($value, $key);
+            if ($invalidRows > 0 && function_exists('add_settings_error')) {
+                add_settings_error('ava_liga', 'ava_invalid_' . $key, sprintf('%s: %d unvollständige oder ungültige Zeile(n) wurden ignoriert.', $field[0], $invalidRows), 'warning');
+            }
+        } elseif ($field[1] === 'textarea') {
+            $clean[$key] = sanitize_textarea_field(is_scalar($value) ? (string) $value : '');
+            $invalidRows = ava_countInvalidManualLeagueRows($clean[$key], $key);
+            if ($invalidRows > 0 && function_exists('add_settings_error')) {
+                add_settings_error(
+                    'ava_liga',
+                    'ava_invalid_' . $key,
+                    sprintf('%s: %d ungültige Zeile(n) werden auf der Website ignoriert.', $field[0], $invalidRows),
+                    'warning'
+                );
+            }
+        } elseif ($field[1] === 'date') {
             $clean[$key] = preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) $value) ? (string) $value : '';
+        } elseif ($field[1] === 'check') {
+            $clean[$key] = $value === '1' ? '1' : '';
         } else {
             $number = absint($value);
             $clean[$key] = $number > 0 ? (string) $number : ($key === 'saison_liga_id' ? $field[2] : '');
         }
     }
     return $clean;
+}
+
+/** Whether league API failures are being simulated for fallback testing. */
+function ava_isLeagueApiTestMode() {
+    $settings = get_option('ava_liga', []);
+    return is_array($settings) && ($settings['test_api_unavailable'] ?? '') === '1';
+}
+
+/**
+ * Parses the manually entered standings used when the league API is unavailable.
+ *
+ * @param mixed $data Structured rows or legacy pipe-separated text.
+ * @return array[]
+ */
+function ava_parseManualLeagueTable($data) {
+    $rows = [];
+    if (is_array($data)) {
+        $inputRows = $data;
+    } else {
+        $inputRows = [];
+        foreach (preg_split('/\r\n|\r|\n/', (string) $data) as $line) {
+            if (trim($line) === '') continue;
+            $columns = array_map('trim', explode('|', $line));
+            if (count($columns) !== 6) {
+                $inputRows[] = [];
+                continue;
+            }
+            $inputRows[] = [
+                'Platzierung' => $columns[0],
+                'TeamName' => $columns[1],
+                'Differenz' => $columns[2],
+                'WertungPlus' => $columns[3],
+                'WertungMinus' => $columns[4],
+                'OrgID' => $columns[5],
+            ];
+        }
+    }
+
+    foreach ($inputRows as $inputRow) {
+        if (!is_array($inputRow)) continue;
+        $row = [];
+        foreach (['Platzierung', 'TeamName', 'Differenz', 'WertungPlus', 'WertungMinus', 'OrgID'] as $key) {
+            $value = $inputRow[$key] ?? '';
+            $row[$key] = is_scalar($value) ? trim((string) $value) : '';
+        }
+        if (implode('', $row) === '') continue;
+        if ($row['TeamName'] === '' || !preg_match('/^\d+$/', $row['Platzierung'])) continue;
+        if (!is_numeric($row['Differenz']) || !is_numeric($row['WertungPlus']) || !is_numeric($row['WertungMinus'])) continue;
+        if ($row['OrgID'] !== '' && !preg_match('/^\d+$/', $row['OrgID'])) continue;
+
+        $rows[] = [
+            'Platzierung' => (int) $row['Platzierung'],
+            'TeamName' => sanitize_text_field($row['TeamName']),
+            'Differenz' => 0 + $row['Differenz'],
+            'WertungPlus' => 0 + $row['WertungPlus'],
+            'WertungMinus' => 0 + $row['WertungMinus'],
+            'OrgID' => (int) $row['OrgID'],
+        ];
+    }
+    return $rows;
+}
+
+/**
+ * Parses manually entered matches used when the league API is unavailable.
+ *
+ * @param mixed $data Structured rows or legacy pipe-separated text.
+ * @return array[]
+ */
+function ava_parseManualLeagueMatches($data) {
+    $matches = [];
+    if (is_array($data)) {
+        $inputRows = $data;
+    } else {
+        $inputRows = [];
+        foreach (preg_split('/\r\n|\r|\n/', (string) $data) as $line) {
+            if (trim($line) === '') continue;
+            $columns = array_map('trim', explode('|', $line));
+            if (count($columns) !== 8) {
+                $inputRows[] = [];
+                continue;
+            }
+            $inputRows[] = [
+                'KampftagIst' => $columns[0],
+                'Beginn' => $columns[1],
+                'HeimMannschaft' => $columns[2],
+                'GastMannschaft' => $columns[3],
+                'PunkteHeimWertung' => $columns[4],
+                'PunkteGastWertung' => $columns[5],
+                'HeimOrganisationsID' => $columns[6],
+                'GastOrganisationsID' => $columns[7],
+            ];
+        }
+    }
+
+    foreach ($inputRows as $inputRow) {
+        if (!is_array($inputRow)) continue;
+        $row = [];
+        foreach (['KampftagIst', 'Beginn', 'HeimMannschaft', 'GastMannschaft', 'PunkteHeimWertung', 'PunkteGastWertung', 'HeimOrganisationsID', 'GastOrganisationsID'] as $key) {
+            $value = $inputRow[$key] ?? '';
+            $row[$key] = is_scalar($value) ? trim((string) $value) : '';
+        }
+        if (implode('', $row) === '') continue;
+        if ($row['HeimMannschaft'] === '' || $row['GastMannschaft'] === '') continue;
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $row['KampftagIst'])) continue;
+        $dateParts = explode('-', $row['KampftagIst']);
+        if (!checkdate((int) $dateParts[1], (int) $dateParts[2], (int) $dateParts[0])) continue;
+        if ($row['Beginn'] !== '') {
+            if (!preg_match('/^(\d{1,2}):(\d{2})$/', $row['Beginn'], $timeParts)) continue;
+            if ((int) $timeParts[1] > 23 || (int) $timeParts[2] > 59) continue;
+        }
+        if (($row['PunkteHeimWertung'] !== '' && !is_numeric($row['PunkteHeimWertung'])) || ($row['PunkteGastWertung'] !== '' && !is_numeric($row['PunkteGastWertung']))) continue;
+        if (($row['PunkteHeimWertung'] === '') !== ($row['PunkteGastWertung'] === '')) continue;
+        if ($row['HeimOrganisationsID'] !== '' && !preg_match('/^\d+$/', $row['HeimOrganisationsID'])) continue;
+        if ($row['GastOrganisationsID'] !== '' && !preg_match('/^\d+$/', $row['GastOrganisationsID'])) continue;
+
+        $matches[] = [
+            'KampftagIst' => $row['KampftagIst'],
+            'Beginn' => $row['Beginn'],
+            'HeimMannschaft' => sanitize_text_field($row['HeimMannschaft']),
+            'GastMannschaft' => sanitize_text_field($row['GastMannschaft']),
+            'PunkteHeimWertung' => $row['PunkteHeimWertung'] === '' ? null : 0 + $row['PunkteHeimWertung'],
+            'PunkteGastWertung' => $row['PunkteGastWertung'] === '' ? null : 0 + $row['PunkteGastWertung'],
+            'HeimOrganisationsID' => (int) $row['HeimOrganisationsID'],
+            'GastOrganisationsID' => (int) $row['GastOrganisationsID'],
+        ];
+    }
+    return $matches;
+}
+
+/** Counts non-empty manual data rows rejected by the corresponding parser. */
+function ava_countInvalidManualLeagueRows($data, $key) {
+    if (is_array($data)) {
+        $rows = array_filter($data, function ($row) {
+            return is_array($row) && count(array_filter($row, function ($value) {
+                return is_scalar($value) && trim((string) $value) !== '';
+            })) > 0;
+        });
+    } else {
+        $rows = array_filter(preg_split('/\r\n|\r|\n/', (string) $data), function ($line) {
+            return trim($line) !== '';
+        });
+    }
+    $valid = $key === 'manual_table'
+        ? ava_parseManualLeagueTable($data)
+        : ava_parseManualLeagueMatches($data);
+    return count($rows) - count($valid);
+}
+
+/** Prints the repeatable row editor for manual standings or matches. */
+function ava_renderManualLeagueRows($inputName, $key, $value) {
+    if ($key === 'manual_table') {
+        $rows = ava_parseManualLeagueTable($value);
+        $columns = [
+            'Platzierung' => ['Platz', 'number'],
+            'TeamName' => ['Mannschaft', 'text'],
+            'Differenz' => ['Differenz', 'number'],
+            'WertungPlus' => ['Punkte Plus', 'number'],
+            'WertungMinus' => ['Punkte Minus', 'number'],
+            'OrgID' => ['OrgID', 'number'],
+        ];
+    } else {
+        $rows = ava_parseManualLeagueMatches($value);
+        $columns = [
+            'KampftagIst' => ['Datum', 'date'],
+            'Beginn' => ['Beginn', 'time'],
+            'HeimMannschaft' => ['Heim', 'text'],
+            'GastMannschaft' => ['Gast', 'text'],
+            'PunkteHeimWertung' => ['Punkte Heim', 'number'],
+            'PunkteGastWertung' => ['Punkte Gast', 'number'],
+            'HeimOrganisationsID' => ['Heim-OrgID', 'number'],
+            'GastOrganisationsID' => ['Gast-OrgID', 'number'],
+        ];
+    }
+
+    $wrapper = 'ava-' . $key;
+    printf('<div class="ava-manual-rows" id="%s" data-next-index="%d">', esc_attr($wrapper), count($rows));
+    echo '<div style="overflow-x:auto"><table class="widefat striped"><thead><tr>';
+    foreach ($columns as $column) {
+        printf('<th scope="col">%s</th>', esc_html($column[0]));
+    }
+    echo '<th scope="col">Aktion</th></tr></thead><tbody>';
+    foreach ($rows as $index => $row) {
+        ava_renderManualLeagueRow($inputName, $index, $row, $columns);
+    }
+    echo '</tbody></table></div>';
+    printf('<p><button type="button" class="button ava-add-manual-row" data-target="%s">Zeile hinzufügen</button></p>', esc_attr($wrapper));
+    echo '<template class="ava-manual-row-template">';
+    ava_renderManualLeagueRow($inputName, '__index__', [], $columns);
+    echo '</template></div>';
+}
+
+/** Prints one row in a repeatable manual league-data editor. */
+function ava_renderManualLeagueRow($inputName, $index, $row, $columns) {
+    echo '<tr>';
+    foreach ($columns as $key => $column) {
+        $name = $inputName . '[' . $index . '][' . $key . ']';
+        $value = isset($row[$key]) && $row[$key] !== null ? $row[$key] : '';
+        printf(
+            '<td><input type="%s" name="%s" value="%s" class="regular-text" aria-label="%s"></td>',
+            esc_attr($column[1]),
+            esc_attr($name),
+            esc_attr($value),
+            esc_attr($column[0])
+        );
+    }
+    echo '<td><button type="button" class="button-link-delete ava-remove-manual-row">Entfernen</button></td></tr>';
 }
 
 add_action('admin_init', function () {
@@ -163,7 +416,9 @@ function ava_renderLeagueSettingsPage() {
             Tabelle und Kampftage auf der Startseite werden live von liga-db.de geladen
             (<code>GET https://ringen.liga-db.de/api/ErgebnisTabelle</code> und <code>api/TeamMatches</code>)
             und 15 Minuten zwischengespeichert. Hier stellst du die Parameter der Aufrufe ein.
+            Wenn die API nicht erreichbar ist, werden die unten gepflegten manuellen Ersatzdaten verwendet.
         </p>
+        <?php settings_errors('ava_liga'); ?>
         <form method="post" action="options.php">
     <?php
     settings_fields('ava_liga');
@@ -177,12 +432,37 @@ function ava_renderLeagueSettingsPage() {
             printf('<h2>%s</h2><table class="form-table">', esc_html($currentSection));
         }
         printf('<tr><th>%s</th><td>', esc_html($field[0]));
-        ava_renderField('ava_liga[' . $key . ']', $field, ava_getLeagueOption($key));
+        if ($field[1] === 'manual_table' || $field[1] === 'manual_matches') {
+            ava_renderManualLeagueRows('ava_liga[' . $key . ']', $key, ava_getLeagueOption($key));
+        } else {
+            ava_renderField('ava_liga[' . $key . ']', $field, ava_getLeagueOption($key));
+        }
         printf('<p class="description">%s</p></td></tr>', esc_html($field[3]));
     }
     echo '</table>';
     submit_button();
     echo '</form>';
+    ?>
+    <script>
+    jQuery(function ($) {
+        $(".ava-add-manual-row").on("click", function () {
+            var wrapper = $("#" + $(this).data("target"));
+            var template = wrapper.find(".ava-manual-row-template")[0];
+            var index = parseInt(wrapper.attr("data-next-index"), 10);
+            var row = document.importNode(template.content, true);
+            $(row).find("input").each(function () {
+                this.name = this.name.replace("__index__", index);
+            });
+            wrapper.find("tbody").append(row);
+            wrapper.attr("data-next-index", index + 1);
+        });
+
+        $(".ava-manual-rows").on("click", ".ava-remove-manual-row", function () {
+            $(this).closest("tr").remove();
+        });
+    });
+    </script>
+    <?php
 
     ava_renderLeagueDetectTool();
     ava_renderTeamSearchTool();

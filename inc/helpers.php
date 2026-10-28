@@ -81,6 +81,10 @@ function ava_getPostImageUrl($postId, $size = 'ava-card') {
  * @return array|WP_Error Decoded response, or an error if the call failed.
  */
 function ava_fetchLigaDb($endpoint, $queryArgs = []) {
+    if (ava_isLeagueApiTestMode() && in_array($endpoint, ['ErgebnisTabelle', 'TeamMatches'], true)) {
+        return new WP_Error('ava_liga_db_test', 'Liga-DB-Ausfall wird im Testmodus simuliert.');
+    }
+
     $response = wp_remote_get(
         add_query_arg($queryArgs, 'https://ringen.liga-db.de/api/' . $endpoint),
         ['timeout' => 8, 'headers' => ['Accept' => 'application/json']]
@@ -96,7 +100,7 @@ function ava_fetchLigaDb($endpoint, $queryArgs = []) {
 
 /**
  * Returns the league standings from the liga-db.de API (ErgebnisTabelle),
- * cached for 15 minutes. Returns an empty array when the API is unavailable.
+ * cached for 15 minutes. Uses manually entered standings when the API is unavailable.
  * Parameters come from the "Tabelle" admin page (see league-settings.php).
  *
  * @param int|null $saisonLigaId liga-db.de league ID; default: saved setting.
@@ -111,11 +115,20 @@ function ava_getLeagueTable($saisonLigaId = null, $kampfTagId = null) {
     if ($kampfTagId > 0) $queryArgs['kampfTagID'] = $kampfTagId;
 
     $cacheKey = 'ava_liga_table_' . $saisonLigaId . '_' . $kampfTagId;
-    $cached = get_transient($cacheKey);
-    if (is_array($cached)) return $cached;
+    if (!ava_isLeagueApiTestMode()) {
+        $cached = get_transient($cacheKey);
+        if (is_array($cached)) return $cached;
+    }
 
     $rows = ava_fetchLigaDb('ErgebnisTabelle', $queryArgs);
-    if (is_wp_error($rows)) return [];
+    if (is_wp_error($rows)) {
+        $settings = get_option('ava_liga', []);
+        $rows = ava_parseManualLeagueTable(is_array($settings) ? ($settings['manual_table'] ?? '') : '');
+        usort($rows, function ($a, $b) {
+            return ($a['Platzierung'] ?? 0) <=> ($b['Platzierung'] ?? 0);
+        });
+        return $rows;
+    }
 
     usort($rows, function ($a, $b) {
         return ($a['Platzierung'] ?? 0) <=> ($b['Platzierung'] ?? 0);
@@ -126,8 +139,8 @@ function ava_getLeagueTable($saisonLigaId = null, $kampfTagId = null) {
 
 /**
  * Returns the team matches from the liga-db.de API (TeamMatches), sorted by
- * date and start time and cached for 15 minutes. Returns an empty array when
- * the API is unavailable. Parameters come from the "Tabelle" admin page.
+ * date and start time and cached for 15 minutes. Uses manually entered matches
+ * when the API is unavailable. Parameters come from the "Tabelle" admin page.
  *
  * @return array[] Rows with keys BegegnungsID, KampftagIst, Beginn, HeimMannschaft, GastMannschaft,
  *                 PunkteHeimWertung, PunkteGastWertung (null until played), HeimOrganisationsID, ...
@@ -143,11 +156,20 @@ function ava_getLeagueMatches() {
     if ($logicalMatchDay > 0) $queryArgs['logischerKampftag'] = $logicalMatchDay;
 
     $cacheKey = 'ava_liga_matches_' . md5(http_build_query($queryArgs));
-    $cached = get_transient($cacheKey);
-    if (is_array($cached)) return $cached;
+    if (!ava_isLeagueApiTestMode()) {
+        $cached = get_transient($cacheKey);
+        if (is_array($cached)) return $cached;
+    }
 
     $matches = ava_fetchLigaDb('TeamMatches', $queryArgs);
-    if (is_wp_error($matches)) return [];
+    if (is_wp_error($matches)) {
+        $settings = get_option('ava_liga', []);
+        $matches = ava_parseManualLeagueMatches(is_array($settings) ? ($settings['manual_matches'] ?? '') : '');
+        usort($matches, function ($a, $b) {
+            return [$a['KampftagIst'] ?? '', $a['Beginn'] ?? ''] <=> [$b['KampftagIst'] ?? '', $b['Beginn'] ?? ''];
+        });
+        return $matches;
+    }
 
     usort($matches, function ($a, $b) {
         return [$a['KampftagIst'] ?? '', $a['Beginn'] ?? ''] <=> [$b['KampftagIst'] ?? '', $b['Beginn'] ?? ''];

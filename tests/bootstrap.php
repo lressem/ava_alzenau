@@ -19,6 +19,7 @@ function wp_stub_reset() {
         'posts'      => [], // posts created via wp_insert_post()
         'post_types' => [], // post type => args from register_post_type()
         'pages'      => [], // slugs of existing pages
+        'transients' => [], // transient name => value
         'last_get_posts' => [],
     ];
 }
@@ -34,6 +35,11 @@ function wp_enqueue_media() {}
 // --- Data access ---
 function get_option($name, $default = false) { return $GLOBALS['wp_stub']['options'][$name] ?? $default; }
 function update_option($name, $value) { $GLOBALS['wp_stub']['options'][$name] = $value; }
+function get_transient($name) { return $GLOBALS['wp_stub']['transients'][$name] ?? false; }
+function set_transient($name, $value, $expiration) { $GLOBALS['wp_stub']['transients'][$name] = $value; }
+function add_query_arg($args, $url) { return $url . '?' . http_build_query($args); }
+function is_wp_error($value) { return $value instanceof WP_Error; }
+function wp_remote_get() { return new WP_Error(); }
 function get_post_meta($id, $key) { return $GLOBALS['wp_stub']['meta'][$id][$key] ?? ''; }
 function get_the_post_thumbnail_url($id) { return $GLOBALS['wp_stub']['thumbs'][$id] ?? false; }
 function get_template_directory_uri() { return 'http://example.test/theme'; }
@@ -52,6 +58,9 @@ function sanitize_title($s) { return strtolower(preg_replace('/[^A-Za-z0-9]+/', 
 function absint($n) { return abs((int) $n); }
 function selected($a, $b, $echo = true) { return (string) $a === (string) $b ? ' selected="selected"' : ''; }
 function checked($a, $b, $echo = true) { return (string) $a === (string) $b ? ' checked="checked"' : ''; }
+
+class WP_Error {}
+define('MINUTE_IN_SECONDS', 60);
 
 // Load the theme code under test.
 require_once __DIR__ . '/../inc/core.php';

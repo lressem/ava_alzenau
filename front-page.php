@@ -357,6 +357,12 @@ $renderSponsorLogo = function ($sponsor, $class = 'lg') use ($backgroundStyle) {
           <dt><?php ava_e('E-Mail'); ?></dt>
           <dd><a href="mailto:<?php echo esc_attr(ava_getOption('k_mail')); ?>"><?php echo esc_html(ava_getOption('k_mail')); ?></a></dd>
         </div>
+        <?php if (ava_getOption('k_antrag_pdf')): ?>
+        <div>
+          <dt><?php ava_e('Mitgliedschaft'); ?></dt>
+          <dd><a href="<?php echo esc_url(ava_getOption('k_antrag_pdf')); ?>" target="_blank" rel="noopener"><?php ava_e('Mitgliedsantrag (PDF)'); ?></a></dd>
+        </div>
+        <?php endif; ?>
         <?php
         $socialLinks = [];
         if (ava_getOption('k_insta')) {

@@ -67,6 +67,7 @@ function ava_getThemeSettingFields() {
         'k_text'    => ['Text', 'textarea', 'Du hast Fragen zur Mitgliedschaft, zu den Trainingszeiten oder zu unseren Kampftagen? Melde dich direkt bei uns. Vorstand und Trainerteam helfen gerne weiter.', 'Kontakt'],
         'k_tel'     => ['Telefon', 'text', '+49 (0) 6023 987654', 'Kontakt'],
         'k_mail'    => ['E-Mail', 'text', 'kontakt@ringerverein-alzenau.de', 'Kontakt'],
+        'k_antrag_pdf' => ['Mitgliedsantrag (PDF)', 'media', ava_getAssetUrl('pdf/mitgliedsantrag.pdf'), 'Kontakt'],
         'k_insta'   => ['Instagram-Link', 'url', '', 'Kontakt'],
         'k_fb'      => ['Facebook-Link', 'url', '', 'Kontakt'],
         'map_img'   => ['Kartenbild', 'media', '', 'Kontakt'],

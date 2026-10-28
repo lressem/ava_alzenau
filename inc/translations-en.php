@@ -93,6 +93,8 @@ return [
     'Schreibe uns eine Nachricht'     => 'Send us a message',
     'Telefon'                         => 'Phone',
     'E-Mail'                          => 'Email',
+    'Mitgliedschaft'                  => 'Membership',
+    'Mitgliedsantrag (PDF)'           => 'Membership application (PDF)',
     'Social Media'                    => 'Social media',
     'Karte öffnen'                    => 'Open map',
     'Unterstütze uns und werde Teil des Teams' => 'Support us and become part of the team',

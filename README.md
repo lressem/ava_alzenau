@@ -64,3 +64,11 @@ hebt die passende Tabellenzeile hervor und bestimmt, ob ein Kampf ein Heimkampf 
 
 Spalten auf der Webseite: Pl. = `Platzierung`, Verein = `TeamName`, Diff. = `Differenz`, Punkte = `WertungPlus:WertungMinus`.
 Der frühere Beitragstyp "Tabelle" (Dummy-Daten) wurde entfernt; bereits angelegte Einträge können gelöscht werden.
+
+## Mitgliedsantrag (PDF)
+
+Unter **Vereinsdaten > Kontakt > Mitgliedsantrag (PDF)** wird die PDF-Datei über die Mediathek hochgeladen oder ausgewählt
+(Option `ava_opts`, Schlüssel `k_antrag_pdf`). Sie bleibt gespeichert, bis ein Admin eine andere Datei wählt.
+In der Kontaktkarte erscheint unter der E-Mail der Link „Mitgliedsantrag (PDF)“ (englisch: „Membership application (PDF)“),
+der das PDF in einem neuen Tab öffnet. Ohne hinterlegte Datei wird der Link ausgeblendet.
+Standard ist ein leeres Platzhalter-PDF (`assets/pdf/mitgliedsantrag.pdf`), bis ein Admin das echte Formular auswählt.

@@ -223,7 +223,7 @@ header {
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  border: 3px solid var(--blue);
+  border: 3px solid var(--purple);
   background: var(--purple);
   box-shadow: inset 0 0 0 3px #fff;
   flex: none;
@@ -255,7 +255,7 @@ nav a:hover {
   color: var(--gold);
 }
 nav a.on {
-  color: var(--blue-l);
+  color: var(--on-hover-purple);
 }
 @media (max-width: 980px) {
   nav ul {
@@ -400,7 +400,7 @@ nav a.on {
   font: 700 14px var(--head);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--blue-l);
+  color: var(--on-hover-purple);
 }
 .note {
   margin-top: 18px;
@@ -452,7 +452,7 @@ tr.me td {
   font-weight: 600;
 }
 tr.me td:first-child {
-  box-shadow: inset 3px 0 var(--blue-l);
+  box-shadow: inset 3px 0 var(--on-hover-purple);
 }
 .match {
   display: flex;
@@ -691,8 +691,8 @@ tr.me td:first-child {
   top: 15px;
   width: 10px;
   height: 5px;
-  border-left: 2px solid var(--blue-l);
-  border-bottom: 2px solid var(--blue-l);
+  border-left: 2px solid var(--on-hover-purple);
+  border-bottom: 2px solid var(--on-hover-purple);
   transform: rotate(-45deg);
 }
 .plans .card {
@@ -736,7 +736,7 @@ tr.me td:first-child {
   gap: 20px;
   align-items: center;
   justify-content: space-between;
-  border-left: 3px solid var(--blue);
+  border-left: 3px solid var(--purple);
 }
 .probe h3 {
   margin-bottom: 6px;
@@ -786,7 +786,7 @@ tr.me td:first-child {
   margin: 0;
 }
 .contact a:hover {
-  color: var(--blue-l);
+  color: var(--on-hover-purple);
 }
 
 /* Sponsoren groß */
@@ -1205,7 +1205,7 @@ h3,
     opacity 0.2s;
 }
 .car-btn:hover:not(:disabled) {
-  background: var(--blue);
+  background: var(--on-hover-purple);
 }
 .car-btn:disabled {
   opacity: 0.35;

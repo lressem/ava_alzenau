@@ -43,6 +43,7 @@ Text Domain: ava
   --blue: #0057b8;
   --blue-l: #0057b8;
   --purple: #7b2cbf;
+  --on-hover-purple:#9B4DCA;
   --card: #12161f;
   --gold: #d4af37;
   --bg: #0a0c10;
@@ -139,8 +140,8 @@ h3 {
   transition: background 0.2s;
 }
 .btn:hover {
-  background: var(--blue-l);
-  border-color: var(--blue-l);
+  background: var(--on-hover-purple);
+  border-color: var(--on-hover-purple);
 }
 .btn.ghost {
   background: transparent;
@@ -457,7 +458,6 @@ tr.me td:first-child {
   display: flex;
   flex-direction: column;
   text-align: center;
-  border-top: 3px solid var(--gold);
 }
 .match .next {
   flex: 1;
@@ -468,10 +468,10 @@ tr.me td:first-child {
 }
 .match .tag {
   display: inline-block;
-  background: var(--gold);
-  color: #000;
-  font: 700 24px var(--head);
-  letter-spacing: 0.1em;
+  background: transparent;
+  color: var(--purple);
+  font: 700 22px var(--body);
+  letter-spacing: 0.04em;
   padding: 3px 10px;
   text-transform: uppercase;
 }
@@ -641,7 +641,7 @@ tr.me td:first-child {
 .stat b {
   display: block;
   font: 800 40px var(--head);
-  color: var(--blue-l);
+  color: var(--purple);
   line-height: 1;
 }
 .stat span {
@@ -810,7 +810,7 @@ tr.me td:first-child {
   gap: 16px;
   align-items: center;
   justify-content: space-between;
-  border-top: 3px solid var(--blue);
+  border-top: 3px solid var(--purple);
 }
 .sp-cta h3 {
   font-size: 22px;
